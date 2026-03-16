@@ -2,8 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Metropolis – .otf files in public/fonts/ */
+@font-face {
+  font-family: "Metropolis-Thin";
+  src: url("/fonts/Metropolis-Thin.otf") format("opentype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metropolis-ExtraLight";
+  src: url("/fonts/Metropolis-ExtraLight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metropolis-Light";
+  src: url("/fonts/Metropolis-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metropolis-Regular";
+  src: url("/fonts/Metropolis-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metropolis-Medium";
+  src: url("/fonts/Metropolis-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metropolis-SemiBold";
+  src: url("/fonts/Metropolis-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metropolis-Bold";
+  src: url("/fonts/Metropolis-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metropolis-ExtraBold";
+  src: url("/fonts/Metropolis-ExtraBold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metropolis-Black";
+  src: url("/fonts/Metropolis-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
+    /* ResQ gradient tokens (hero / radial glow) */
+    --gradient-start: #001a3d;
+    --gradient-mid: #000814;
+    --gradient-end: #000000;
+    --gradient-radial-inner: rgba(0, 26, 61, 0.45);
+    --gradient-radial-mid: rgba(0, 8, 20, 0.25);
+    --gradient-radial-outer: transparent;
+    --sidebar-bg: #0a0a0a;
+
+    --font-metropolis: "Metropolis-Regular", system-ui, sans-serif;
+    --font-metropolis-thin: "Metropolis-Thin", system-ui, sans-serif;
+    --font-metropolis-extralight: "Metropolis-ExtraLight", system-ui, sans-serif;
+    --font-metropolis-light: "Metropolis-Light", system-ui, sans-serif;
+    --font-metropolis-regular: "Metropolis-Regular", system-ui, sans-serif;
+    --font-metropolis-medium: "Metropolis-Medium", system-ui, sans-serif;
+    --font-metropolis-semibold: "Metropolis-SemiBold", system-ui, sans-serif;
+    --font-metropolis-bold: "Metropolis-Bold", system-ui, sans-serif;
+    --font-metropolis-extrabold: "Metropolis-ExtraBold", system-ui, sans-serif;
+    --font-metropolis-black: "Metropolis-Black", system-ui, sans-serif;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -68,3 +152,62 @@
   }
 }
 
+/* ResQ theme scrollbars */
+* {
+  scrollbar-width: thin;
+  /* Default: pure black thumb + track */
+  scrollbar-color: #000000 #000000;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #000000;
+  border-radius: 10px;
+  border: 2px solid #000000;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #000000;
+}
+
+/* Light / non-dark contexts: use surface-light track and blue thumb */
+html:not(.dark) {
+  scrollbar-color: #0000FF #F7F7F7;
+}
+
+html:not(.dark) *::-webkit-scrollbar-track {
+  background: #F7F7F7;
+}
+
+html:not(.dark) *::-webkit-scrollbar-thumb {
+  background: #0000FF;
+  border-color: #F7F7F7;
+}
+
+@layer utilities {
+  .bg-gradient-radial {
+    background-image: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-slow {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+}

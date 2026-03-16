@@ -1,5 +1,5 @@
 {
-  "name": "ResQ Internal",
+  "name": "ResQ-Internal",
   "version": "0.1.0",
   "private": true,
   "packageManager": "yarn@1.22.22",
@@ -20,6 +20,7 @@
     "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.554.0",
     "next": "16.0.3",
     "next-auth": "^4.24.13",
