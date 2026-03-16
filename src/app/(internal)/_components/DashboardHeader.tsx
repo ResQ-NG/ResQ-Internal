@@ -47,8 +47,28 @@ export function DashboardHeader({
   };
 
   const breadcrumb = (() => {
-    if (pathname.startsWith("/dashboard/live-incidents")) {
+    if (pathname.startsWith("/overview/live-incidents")) {
       return "Command Center / Live incidents";
+    }
+    if (pathname === "/overview" || pathname === "/") {
+      return "Command Center / Overview";
+    }
+    if (pathname.startsWith("/media/")) {
+      if (pathname.startsWith("/media/overview")) return "Media / Overview";
+      if (pathname.startsWith("/media/reports")) return "Media / Verified reports";
+      if (pathname.startsWith("/media/broadcasts")) return "Media / Broadcasts";
+      if (pathname.startsWith("/media/maps")) return "Media / Maps";
+      if (pathname.startsWith("/media/teams")) return "Media / Teams";
+      return "Media";
+    }
+    if (pathname.startsWith("/agencies/")) {
+      if (pathname.startsWith("/agencies/overview")) return "Agencies / Live reports";
+      if (pathname.startsWith("/agencies/cases/")) return "Agencies / Case detail";
+      if (pathname.startsWith("/agencies/cases")) return "Agencies / Cases";
+      if (pathname.startsWith("/agencies/map")) return "Agencies / Map";
+      if (pathname.startsWith("/agencies/broadcasts")) return "Agencies / Broadcasts";
+      if (pathname.startsWith("/agencies/settings")) return "Agencies / Settings";
+      return "Agencies";
     }
     if (pathname.startsWith("/dashboard/agencies")) {
       return "Agencies";
@@ -65,7 +85,7 @@ export function DashboardHeader({
     if (pathname.startsWith("/dashboard/settings")) {
       return "Settings";
     }
-    return "Command Center / Overview";
+    return "Command Center";
   })();
 
   return (
