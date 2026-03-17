@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   AppHeading,
@@ -6,8 +8,13 @@ import {
   AppLink,
   AppImage,
 } from "@/components/ui";
+import { useUIStore } from "@/store/ui-store";
+import { showAppAlert } from "@/components/ui";
 
 export default function DesignSystemPage() {
+  const openModal = useUIStore((state) => state.openModal);
+  const openSidebar = useUIStore((state) => state.openSidebar);
+
   return (
     <div className="min-h-screen bg-surface-light dark:bg-surface-dark font-metropolis">
       {/* Header */}
@@ -241,6 +248,137 @@ export default function DesignSystemPage() {
                 <AppParagraph variant="caption" size="md">
                   Caption – Muted supporting text, labels, or timestamps.
                 </AppParagraph>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Glass / overlays */}
+        <section>
+          <AppHeading as={2} size="lg" className="mb-2">
+            Overlays & glass
+          </AppHeading>
+          <AppParagraph variant="caption" className="mb-8">
+            Global glassmorphism modal and sidebar, powered by Zustand + persist.
+          </AppParagraph>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-xl border border-gray-200/70 dark:border-gray-700/70 bg-white/70 dark:bg-black/40 p-6 backdrop-blur-xl">
+              <AppParagraph variant="caption" className="mb-3 text-xs uppercase tracking-[0.16em] text-captionDark dark:text-captionDark-dark">
+                AppModalRoot (glass)
+              </AppParagraph>
+              <AppParagraph variant="body" className="mb-4 text-sm">
+                Opens a centered glassmorphism modal with a frosted black backdrop
+                (<code className="rounded bg-black/10 px-1 py-0.5 text-[11px]">backdrop-blur-xl</code>).
+              </AppParagraph>
+              <AppButton
+                variant="primary"
+                size="sm"
+                onClick={() =>
+                  openModal({
+                    title: "ResQ glass modal",
+                    size: "md",
+                    content: (
+                      <div className="space-y-3 text-sm">
+                        <AppParagraph variant="body" size="sm">
+                          This is a global modal rendered from anywhere in the app. The
+                          backdrop and surface both use glassmorphism — subtle blur,
+                          transparency and soft borders.
+                        </AppParagraph>
+                        <AppParagraph variant="caption" size="sm">
+                          Hook it up to confirmations, quick inspectors, or lightweight
+                          creation flows.
+                        </AppParagraph>
+                      </div>
+                    ),
+                  })
+                }
+              >
+                Open glass modal
+              </AppButton>
+            </div>
+
+            <div className="rounded-xl border border-gray-200/70 dark:border-gray-700/70 bg-white/70 dark:bg-black/40 p-6 backdrop-blur-xl">
+              <AppParagraph variant="caption" className="mb-3 text-xs uppercase tracking-[0.16em] text-captionDark dark:text-captionDark-dark">
+                AppSidebarRoot (glass)
+              </AppParagraph>
+              <AppParagraph variant="body" className="mb-4 text-sm">
+                Opens a right-hand glass sidebar with a blurred backdrop. Useful for
+                quick panels, filters, or multi-step flows.
+              </AppParagraph>
+              <AppButton
+                variant="accent"
+                size="sm"
+                onClick={() =>
+                  openSidebar({
+                    title: "Glass sidebar",
+                    content: (
+                      <div className="space-y-3 text-sm">
+                        <AppParagraph variant="body" size="sm">
+                          This sidebar slides over a glass backdrop so underlying content
+                          stays visible but deemphasised.
+                        </AppParagraph>
+                        <AppParagraph variant="caption" size="sm">
+                          Wire this to filters, incident details, or command shortcuts.
+                        </AppParagraph>
+                      </div>
+                    ),
+                  })
+                }
+              >
+                Open glass sidebar
+              </AppButton>
+            </div>
+
+            <div className="rounded-xl border border-gray-200/70 dark:border-gray-700/70 bg-white/70 dark:bg-black/40 p-6 backdrop-blur-xl">
+              <AppParagraph
+                variant="caption"
+                className="mb-3 text-xs uppercase tracking-[0.16em] text-captionDark dark:text-captionDark-dark"
+              >
+                AppAlert (toaster)
+              </AppParagraph>
+              <AppParagraph variant="body" className="mb-4 text-sm">
+                Brand-aware alerts for incidents, media actions, and agency workflows. Uses the
+                global glass toaster and ResQ colors.
+              </AppParagraph>
+              <div className="flex flex-wrap gap-3">
+                <AppButton
+                  variant="surface"
+                  size="sm"
+                  onClick={() =>
+                    showAppAlert("This is a neutral ResQ alert.", {
+                      title: "Info",
+                      variant: "info",
+                    })
+                  }
+                >
+                  Info
+                </AppButton>
+                <AppButton
+                  variant="success"
+                  size="sm"
+                  onClick={() =>
+                    showAppAlert("Incident routed to Lagos agency.", {
+                      title: "Routed",
+                      variant: "success",
+                      description: "You can track it from the Agencies / Cases workspace.",
+                    })
+                  }
+                >
+                  Success
+                </AppButton>
+                <AppButton
+                  variant="accent"
+                  size="sm"
+                  onClick={() =>
+                    showAppAlert("Some broadcasts failed to send.", {
+                      title: "Warning",
+                      variant: "warning",
+                    })
+                  }
+                >
+                  Warning
+                </AppButton>
               </div>
             </div>
           </div>

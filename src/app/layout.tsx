@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AppProviders } from "./providers";
 
 export const metadata: Metadata = {
   title: "ResQ Internal",
@@ -22,7 +23,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="font-metropolis antialiased bg-surface-light text-primaryDark dark:bg-surface-dark dark:text-primaryDark-dark">
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        {children}
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

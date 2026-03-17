@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LottieLogo } from "@/components/LottieLogo";
@@ -20,8 +20,8 @@ import {
   User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUIStore } from "@/store/ui-store";
 
-const SIDEBAR_STORAGE_KEY = "resq-sidebar-expanded";
 const THEME_STORAGE_KEY = "resq-theme";
 
 type NavChild = { href: string; label: string };
@@ -91,13 +91,12 @@ const navItems: NavItem[] = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const [expanded, setExpanded] = useState(false);
+  const expanded = useUIStore((state) => state.internalSidebarExpanded);
+  const setExpanded = useUIStore((state) => state.setInternalSidebarExpanded);
   const [dark, setDark] = useState(true);
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
-      if (stored !== null) setExpanded(JSON.parse(stored));
       const theme = localStorage.getItem(THEME_STORAGE_KEY);
       const isDark = theme !== "light";
       setDark(isDark);
@@ -120,11 +119,6 @@ export function DashboardSidebar() {
 
   const persist = (value: boolean) => {
     setExpanded(value);
-    try {
-      localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(value));
-    } catch {
-      // ignore
-    }
   };
 
   return (

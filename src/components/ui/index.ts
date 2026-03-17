@@ -15,3 +15,8 @@ export type { AppLinkProps } from "./AppLink";
 
 export { AppLottie } from "./AppLottie";
 export type { AppLottieProps, LottieAnimationData } from "./AppLottie";
+
+export { AppModalRoot } from "./AppModal";
+export { AppSidebarRoot } from "./AppSidebar";
+
+export { AppAlertToaster, showAppAlert } from "./AppAlert";
