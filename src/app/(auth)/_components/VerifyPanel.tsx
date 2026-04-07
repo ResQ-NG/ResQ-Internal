@@ -90,14 +90,11 @@ export function VerifyPanel({ token }: { token?: string }) {
         type="button"
         variant="outline"
         size="lg"
-        disabled={resendPending}
+        loading={resendPending}
         onClick={onResend}
-        className={cn(
-          "w-full border-white/40 text-white hover:bg-white hover:text-resq-deep dark:border-white/40 dark:text-white dark:hover:bg-white dark:hover:text-resq-deep",
-          resendPending && "opacity-80"
-        )}
+        className="w-full border-white/40 text-white hover:bg-white hover:text-resq-deep dark:border-white/40 dark:text-white dark:hover:bg-white dark:hover:text-resq-deep"
       >
-        {resendPending ? "Sending…" : "Resend verification email"}
+        Resend verification email
       </AppButton>
 
       <p className="text-center text-sm text-white/70">

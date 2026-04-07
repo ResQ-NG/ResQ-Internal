@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface AppButtonProps
@@ -7,6 +8,8 @@ export interface AppButtonProps
   size?: "sm" | "md" | "lg";
   /** Use for Next.js links styled as buttons */
   asChild?: boolean;
+  /** Shows a spinner and disables the control (ignored when `asChild` is true). */
+  loading?: boolean;
   className?: string;
   children: React.ReactNode;
 }
@@ -27,9 +30,15 @@ const variantClasses: Record<NonNullable<AppButtonProps["variant"]>, string> = {
 };
 
 const sizeClasses: Record<NonNullable<AppButtonProps["size"]>, string> = {
-  sm: "px-3 py-1.5 text-sm rounded-md",
-  md: "px-4 py-2 text-base rounded-lg",
-  lg: "px-6 py-3 text-lg rounded-lg",
+  sm: "px-3 py-1.5 text-sm rounded-md gap-1.5",
+  md: "px-4 py-2 text-base rounded-lg gap-2",
+  lg: "px-6 py-3 text-lg rounded-lg gap-2",
+};
+
+const spinnerSize: Record<NonNullable<AppButtonProps["size"]>, string> = {
+  sm: "size-3.5",
+  md: "size-4",
+  lg: "size-[1.125rem]",
 };
 
 export const AppButton = forwardRef<HTMLButtonElement, AppButtonProps>(
@@ -38,6 +47,7 @@ export const AppButton = forwardRef<HTMLButtonElement, AppButtonProps>(
       variant = "primary",
       size = "md",
       asChild = false,
+      loading = false,
       className,
       children,
       disabled,
@@ -65,15 +75,34 @@ export const AppButton = forwardRef<HTMLButtonElement, AppButtonProps>(
       );
     }
 
+    const isDisabled = Boolean(disabled || loading);
+
     return (
       <button
         ref={ref}
         type="button"
-        disabled={disabled}
-        className={cn(base, variantClasses[variant], sizeClasses[size], className)}
+        disabled={isDisabled}
+        aria-busy={loading || undefined}
+        className={cn(
+          base,
+          variantClasses[variant],
+          sizeClasses[size],
+          loading && "cursor-wait",
+          className
+        )}
         {...rest}
       >
-        {children}
+        {loading ? (
+          <>
+            <Loader2
+              className={cn(spinnerSize[size], "shrink-0 animate-spin")}
+              aria-hidden
+            />
+            <span className="min-w-0">{children}</span>
+          </>
+        ) : (
+          children
+        )}
       </button>
     );
   }

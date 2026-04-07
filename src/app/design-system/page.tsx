@@ -413,6 +413,23 @@ export default function DesignSystemPage() {
                 <AppButton variant="primary" size="lg">Large</AppButton>
               </div>
             </div>
+            <div>
+              <AppParagraph variant="caption" className="mb-4">Loading</AppParagraph>
+              <AppParagraph variant="caption" size="sm" className="mb-4 text-captionDark dark:text-captionDark-dark">
+                Pass <code className="rounded bg-black/10 px-1 py-0.5 text-[11px] dark:bg-white/10">loading</code> to show a spinner and disable the button.
+              </AppParagraph>
+              <div className="flex flex-wrap items-center gap-4">
+                <AppButton variant="primary" loading>
+                  Saving
+                </AppButton>
+                <AppButton variant="outline" loading>
+                  Submit
+                </AppButton>
+                <AppButton variant="accent" size="sm" loading>
+                  Delete
+                </AppButton>
+              </div>
+            </div>
           </div>
         </section>
 

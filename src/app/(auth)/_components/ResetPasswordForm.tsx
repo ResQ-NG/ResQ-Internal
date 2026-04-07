@@ -3,7 +3,6 @@
 import { FormEvent, useState } from "react";
 import { AppButton, AppHeading, AppLink, AppParagraph } from "@/components/ui";
 import { showAppAlert } from "@/components/ui/AppAlert";
-import { cn } from "@/lib/utils";
 
 const fieldClass =
   "w-full rounded-lg border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-metropolis-medium text-white placeholder:text-white/45 outline-none transition focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/35";
@@ -65,10 +64,10 @@ export function ResetPasswordForm() {
         type="submit"
         variant="primary"
         size="lg"
-        disabled={pending}
-        className={cn("w-full", pending && "opacity-80")}
+        loading={pending}
+        className="w-full"
       >
-        {pending ? "Sending…" : "Send reset link"}
+        Send reset link
       </AppButton>
 
       <p className="text-center text-sm text-white/70">
