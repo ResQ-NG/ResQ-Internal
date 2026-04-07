@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import { cn } from "@/lib/utils";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
@@ -39,16 +40,22 @@ export function AppHeading({
   children,
   ...rest
 }: AppHeadingProps) {
-  const Component = (as ? `h${as}` : "h2") as keyof JSX.IntrinsicElements;
   const sizeClass = sizeClasses[size];
   const weightClass = weight ? weightMap[weight] : undefined;
+  const tag = (as ? (`h${as}` as const) : "h2") as
+    | "h1"
+    | "h2"
+    | "h3"
+    | "h4"
+    | "h5"
+    | "h6";
 
-  return (
-    <Component
-      className={cn(sizeClass, weightClass, className)}
-      {...rest}
-    >
-      {children}
-    </Component>
+  return createElement(
+    tag,
+    {
+      className: cn(sizeClass, weightClass, className),
+      ...rest,
+    },
+    children
   );
 }

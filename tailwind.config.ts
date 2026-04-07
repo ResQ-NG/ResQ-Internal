@@ -50,10 +50,6 @@ const config: Config = {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -61,10 +57,6 @@ const config: Config = {
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -107,6 +99,42 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "hero-radial": {
+          "0%, 100%": {
+            transform: "scale(1) translate(0%, 0%)",
+            opacity: "0.78",
+          },
+          "33%": {
+            transform: "scale(1.09) translate(2.5%, -3%)",
+            opacity: "0.98",
+          },
+          "66%": {
+            transform: "scale(0.94) translate(-3%, 2.5%)",
+            opacity: "0.86",
+          },
+        },
+        "hero-radial-alt": {
+          "0%, 100%": {
+            transform: "scale(1.06) translate(0%, 0%)",
+            opacity: "0.45",
+          },
+          "50%": {
+            transform: "scale(1.18) translate(-4%, 3.5%)",
+            opacity: "0.68",
+          },
+        },
+        "hero-gradient": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "35%": { backgroundPosition: "85% 35%" },
+          "70%": { backgroundPosition: "35% 85%" },
+        },
+      },
+      animation: {
+        "hero-radial": "hero-radial 18s ease-in-out infinite",
+        "hero-radial-alt": "hero-radial-alt 24s ease-in-out -7s infinite",
+        "hero-gradient": "hero-gradient 32s ease-in-out infinite",
       },
     },
   },

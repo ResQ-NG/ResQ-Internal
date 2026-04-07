@@ -5,6 +5,10 @@ import { AppProviders } from "./providers";
 export const metadata: Metadata = {
   title: "ResQ Internal",
   description: "Talk to me",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
 };
 
 const themeScript = `

@@ -33,6 +33,12 @@ interface UIState {
   // internal dashboard sidebar
   internalSidebarExpanded: boolean;
   setInternalSidebarExpanded: (expanded: boolean) => void;
+
+  // media + agencies sidebars
+  mediaSidebarExpanded: boolean;
+  setMediaSidebarExpanded: (expanded: boolean) => void;
+  agenciesSidebarExpanded: boolean;
+  setAgenciesSidebarExpanded: (expanded: boolean) => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -50,6 +56,12 @@ export const useUIStore = create<UIState>()(
 
       internalSidebarExpanded: false,
       setInternalSidebarExpanded: (expanded) => set({ internalSidebarExpanded: expanded }),
+
+      mediaSidebarExpanded: false,
+      setMediaSidebarExpanded: (expanded) => set({ mediaSidebarExpanded: expanded }),
+
+      agenciesSidebarExpanded: false,
+      setAgenciesSidebarExpanded: (expanded) => set({ agenciesSidebarExpanded: expanded }),
     }),
     {
       name: "resq-ui-store",
@@ -58,6 +70,8 @@ export const useUIStore = create<UIState>()(
       partialize: (state) => ({
         sidebarOpen: state.sidebarOpen,
         internalSidebarExpanded: state.internalSidebarExpanded,
+        mediaSidebarExpanded: state.mediaSidebarExpanded,
+        agenciesSidebarExpanded: state.agenciesSidebarExpanded,
       }),
     }
   )
