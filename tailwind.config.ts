@@ -130,11 +130,27 @@ const config: Config = {
           "35%": { backgroundPosition: "85% 35%" },
           "70%": { backgroundPosition: "35% 85%" },
         },
+        "inbox-card-enter": {
+          "0%": { opacity: "0", transform: "translateY(14px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        /** ResQ glass skeleton — soft diagonal sheen (brand blue tint) */
+        "glass-sheen": {
+          "0%": { transform: "translateX(-120%) skewX(-14deg)" },
+          "100%": { transform: "translateX(220%) skewX(-14deg)" },
+        },
+        "glass-skeleton-pulse": {
+          "0%, 100%": { opacity: "0.55" },
+          "50%": { opacity: "0.95" },
+        },
       },
       animation: {
         "hero-radial": "hero-radial 18s ease-in-out infinite",
         "hero-radial-alt": "hero-radial-alt 24s ease-in-out -7s infinite",
         "hero-gradient": "hero-gradient 32s ease-in-out infinite",
+        "inbox-card-enter": "inbox-card-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards",
+        "glass-sheen": "glass-sheen 2.35s ease-in-out infinite",
+        "glass-skeleton-pulse": "glass-skeleton-pulse 2s ease-in-out infinite",
       },
     },
   },

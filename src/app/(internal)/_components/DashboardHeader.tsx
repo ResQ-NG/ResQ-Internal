@@ -50,7 +50,7 @@ export function DashboardHeader({
     if (pathname.startsWith("/overview/live-incidents")) {
       return "Command Center / Live incidents";
     }
-    if (pathname === "/overview" || pathname === "/") {
+    if (pathname === "/dashboard" || pathname === "/overview") {
       return "Command Center / Overview";
     }
     if (pathname.startsWith("/media/")) {
@@ -89,7 +89,7 @@ export function DashboardHeader({
   })();
 
   return (
-    <header className={cn("sticky top-0 z-30 px-6 pt-4", className)}>
+    <header className={cn("sticky top-0 z-[9999999] px-6 pt-4", className)}>
       <div className="flex items-center justify-between rounded-2xl border border-captionDark/20 bg-gradient-hero px-5 py-3 shadow-sm backdrop-blur">
         {/* Left: breadcrumb-style context */}
         <AppParagraph variant="caption" className="text-captionDark-dark/80">

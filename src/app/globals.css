@@ -192,6 +192,13 @@ html:not(.dark) *::-webkit-scrollbar-thumb {
   border-color: #F7F7F7;
 }
 
+/* Mapbox GL: hide wordmark + default attribution tray inside ResQ map hosts only.
+   Confirm attribution requirements for your Mapbox plan / style sources in production. */
+.resq-mapbox-host a.mapboxgl-ctrl-logo,
+.resq-mapbox-host .mapboxgl-ctrl-attrib {
+  display: none !important;
+}
+
 @layer utilities {
   .bg-gradient-radial {
     background-image: radial-gradient(circle, var(--tw-gradient-stops));

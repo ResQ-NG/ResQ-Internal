@@ -40,6 +40,7 @@ const navItems: NavItem[] = [
     icon: LayoutDashboard,
     children: [
       { href: "/overview", label: "Overview" },
+      { href: "/overview/map-workspace", label: "Map workspace (Mapbox)" },
       { href: "/overview/live-incidents", label: "Live incidents & floating" },
     ],
   },

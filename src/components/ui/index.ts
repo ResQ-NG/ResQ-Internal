@@ -21,3 +21,6 @@ export { GlobalErrorModalRoot } from "./GlobalErrorModalRoot";
 export { AppSidebarRoot } from "./AppSidebar";
 
 export { AppAlertToaster, showAppAlert } from "./AppAlert";
+
+export { AppGlassSkeleton } from "./AppGlassSkeleton";
+export type { AppGlassSkeletonProps } from "./AppGlassSkeleton";
