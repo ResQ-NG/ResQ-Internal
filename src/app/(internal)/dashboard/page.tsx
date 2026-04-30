@@ -22,8 +22,8 @@ export default function DashboardOverviewPage() {
         {/* State-level heatmap */}
         <StateHeatmapSection />
 
-        {/* Live map workspace */}
-        <DashboardWideMapSection dateRange="Live command window" />
+        {/* Command map (same shell as Workspace) */}
+        <DashboardWideMapSection />
       </div>
     </>
   );

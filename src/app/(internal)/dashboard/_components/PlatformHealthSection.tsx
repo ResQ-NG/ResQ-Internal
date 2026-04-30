@@ -9,8 +9,10 @@ import {
   Gauge,
   RadioTower,
   ShieldCheck,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { INTERNAL_DASHBOARD_ROUTES } from "@/lib/routes/internal-dashboard-routes";
 
 type HealthTone = "good" | "warn" | "bad";
 
@@ -19,7 +21,7 @@ type HealthItem = {
   value: string;
   detail: string;
   tone: HealthTone;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   /** 0–100 — drives the small progress bar */
   score: number;
 };
@@ -95,7 +97,7 @@ export function PlatformHealthSection() {
             Last checked · just now
           </span>
           <Link
-            href="/dashboard/platform"
+            href={INTERNAL_DASHBOARD_ROUTES.platform.root}
             className="inline-flex items-center gap-1 rounded-md border border-captionDark/20 px-2.5 py-1 text-[11px] font-metropolis-semibold text-captionDark transition-colors hover:border-primary-blue/40 hover:bg-primary-blue/[0.06] hover:text-primary-blue dark:border-captionDark-dark/25 dark:text-captionDark-dark dark:hover:border-primary-blue-dark/45 dark:hover:bg-primary-blue-dark/10 dark:hover:text-primary-blue-dark"
           >
             Status page

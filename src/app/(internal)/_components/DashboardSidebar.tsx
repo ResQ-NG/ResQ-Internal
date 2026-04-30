@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { LottieLogo } from "@/components/LottieLogo";
 import {
   LayoutDashboard,
@@ -15,14 +16,20 @@ import {
   PanelLeft,
   Sun,
   Moon,
-  ChevronDown,
-  ChevronRight,
   User,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  INTERNAL_DASHBOARD_ROUTES,
+  isCommandCenterSectionActive,
+  isDashboardNavChildActive,
+} from "@/lib/routes/internal-dashboard-routes";
 import { useUIStore } from "@/store/ui-store";
 
 const THEME_STORAGE_KEY = "resq-theme";
+
+const R = INTERNAL_DASHBOARD_ROUTES;
 
 type NavChild = { href: string; label: string };
 type NavItem = {
@@ -32,59 +39,57 @@ type NavItem = {
   children?: NavChild[];
 };
 
-// High-level IA + focused sub-nav where it helps
 const navItems: NavItem[] = [
   {
-    href: "/overview",
+    href: R.overview,
     label: "Command Center",
     icon: LayoutDashboard,
     children: [
-      { href: "/overview", label: "Overview" },
-      { href: "/overview/map-workspace", label: "Map workspace (Mapbox)" },
-      { href: "/overview/live-incidents", label: "Live incidents & floating" },
+      { href: R.root, label: "Overview" },
+      { href: R.workspace, label: "Workspace" },
     ],
   },
   {
-    href: "/dashboard/agencies",
+    href: R.agencies.root,
     label: "Agencies",
     icon: Building2,
     children: [
-      { href: "/dashboard/agencies", label: "Agency list & branches" },
-      { href: "/dashboard/agencies/routing-rules", label: "Routing rules" },
-      { href: "/dashboard/agencies/staff", label: "Staff & permissions" },
-      { href: "/dashboard/agencies/new", label: "Create agency" },
+      { href: R.agencies.root, label: "Agency list & branches" },
+      { href: R.agencies.routingRules, label: "Routing rules" },
+      { href: R.agencies.staff, label: "Staff & permissions" },
+      { href: R.agencies.new, label: "Create agency" },
     ],
   },
   {
-    href: "/dashboard/incidents",
+    href: R.incidents.root,
     label: "Incidents",
     icon: AlertTriangle,
     children: [
-      { href: "/dashboard/incidents", label: "All incidents" },
-      { href: "/dashboard/incidents/reports", label: "Reports" },
-      { href: "/dashboard/incidents/watch-me-sos", label: "Watch Me & SOS" },
+      { href: R.incidents.root, label: "All incidents" },
+      { href: R.incidents.reports, label: "Reports" },
+      { href: R.incidents.watchMeSos, label: "Watch Me & SOS" },
     ],
   },
   {
-    href: "/dashboard/users",
+    href: R.users.root,
     label: "Users",
     icon: Users,
     children: [
-      { href: "/dashboard/users", label: "All users" },
-      { href: "/dashboard/users/segments", label: "Segments" },
+      { href: R.users.root, label: "All users" },
+      { href: R.users.segments, label: "Segments" },
     ],
   },
   {
-    href: "/dashboard/platform",
+    href: R.platform.root,
     label: "Platform",
     icon: Activity,
     children: [
-      { href: "/dashboard/platform", label: "Health & status" },
-      { href: "/dashboard/platform/logs", label: "Logs & diagnostics" },
+      { href: R.platform.root, label: "Health & status" },
+      { href: R.platform.logs, label: "Logs & diagnostics" },
     ],
   },
   {
-    href: "/dashboard/settings",
+    href: R.settings,
     label: "Settings",
     icon: Settings,
   },
@@ -92,6 +97,7 @@ const navItems: NavItem[] = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const expanded = useUIStore((state) => state.internalSidebarExpanded);
   const setExpanded = useUIStore((state) => state.setInternalSidebarExpanded);
   const [dark, setDark] = useState(true);
@@ -101,7 +107,6 @@ export function DashboardSidebar() {
       const theme = localStorage.getItem(THEME_STORAGE_KEY);
       const isDark = theme !== "light";
       setDark(isDark);
-      document.documentElement.classList.toggle("dark", isDark);
     } catch {
       // ignore
     }
@@ -122,6 +127,14 @@ export function DashboardSidebar() {
     setExpanded(value);
   };
 
+  const profile = session?.user;
+  const displayName =
+    (profile?.first_name || profile?.last_name
+      ? `${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim()
+      : session?.user?.name) || profile?.email || "User";
+  const subtitle = profile?.email ?? "Signed in";
+  const avatarUrl = profile?.avatar_url || undefined;
+
   return (
     <aside
       className={cn(
@@ -130,7 +143,6 @@ export function DashboardSidebar() {
       )}
       style={{ background: "var(--sidebar-bg)" }}
     >
-      {/* Collapse – absolute center of bar, on the right edge */}
       <button
         type="button"
         onClick={() => persist(!expanded)}
@@ -145,7 +157,6 @@ export function DashboardSidebar() {
         )}
       </button>
 
-      {/* ResQ Logo + Internal badge under ResQ text */}
       <div className={cn("mb-8 flex shrink-0 flex-col gap-2", expanded ? "w-full px-3" : "items-center")}>
         <Link
           href="/"
@@ -180,7 +191,6 @@ export function DashboardSidebar() {
         )}
       </div>
 
-      {/* Nav */}
       <nav
         className={cn(
           "flex flex-1 flex-col gap-0.5 overflow-y-auto",
@@ -190,7 +200,9 @@ export function DashboardSidebar() {
       >
         {navItems.map(({ href, label, icon: Icon, children }) => {
           const isSectionActive =
-            pathname === href || pathname.startsWith(href + "/");
+            href === R.overview
+              ? isCommandCenterSectionActive(pathname)
+              : pathname === href || pathname.startsWith(`${href}/`);
           const hasChildren = !!children && children.length > 0;
 
           return (
@@ -219,9 +231,7 @@ export function DashboardSidebar() {
               {expanded && hasChildren && isSectionActive && (
                 <div className="ml-6 flex flex-col border-l border-primaryDark-dark/20 py-1 pl-3">
                   {children!.map((child) => {
-                    const isChildActive =
-                      pathname === child.href ||
-                      pathname.startsWith(child.href + "/");
+                    const isChildActive = isDashboardNavChildActive(pathname, child.href);
                     return (
                       <Link
                         key={child.href}
@@ -244,7 +254,6 @@ export function DashboardSidebar() {
         })}
       </nav>
 
-      {/* Expand/collapse + user */}
       <div
         className={cn(
           "flex flex-col gap-2 border-t border-primaryDark/10 pt-4",
@@ -285,9 +294,8 @@ export function DashboardSidebar() {
             <span className="truncate text-sm font-metropolis-medium">Settings</span>
           )}
         </button>
-        {/* Profile card: image, name, role */}
         <Link
-          href="/dashboard/profile"
+          href={R.profile}
           className={cn(
             "flex shrink-0 items-center gap-3 rounded-lg transition-colors hover:bg-primaryDark-dark/10",
             expanded ? "w-full px-3 py-2" : "h-10 w-10 justify-center"
@@ -295,16 +303,35 @@ export function DashboardSidebar() {
           aria-label="Profile"
         >
           <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-blue/30 text-white ring-2 ring-primary-blue dark:ring-primary-blue-dark">
-            <User className="h-4 w-4 shrink-0" aria-hidden />
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- remote avatar URLs depend on upstream config; keep simple for internal tool
+              <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <User className="h-4 w-4 shrink-0" aria-hidden />
+            )}
             <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-success-green" aria-hidden />
           </span>
           {expanded && (
             <div className="flex min-w-0 flex-1 flex-col items-start">
-              <span className="truncate text-sm font-metropolis-semibold text-white">User Name</span>
-              <span className="truncate text-xs font-metropolis-medium text-captionDark-dark">Team Lead</span>
+              <span className="truncate text-sm font-metropolis-semibold text-white">{displayName}</span>
+              <span className="truncate text-xs font-metropolis-medium text-captionDark-dark">{subtitle}</span>
             </div>
           )}
         </Link>
+
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/authourize" })}
+          className={cn(
+            "flex shrink-0 items-center gap-3 rounded-lg text-captionDark-dark transition-colors hover:bg-primaryDark-dark/10 hover:text-primaryDark-dark",
+            expanded ? "h-10 w-full px-3" : "h-10 w-10 justify-center"
+          )}
+          aria-label="Sign out"
+          title="Sign out"
+        >
+          <LogOut className="h-4 w-4 shrink-0" aria-hidden />
+          {expanded && <span className="truncate text-sm font-metropolis-medium">Sign out</span>}
+        </button>
       </div>
     </aside>
   );

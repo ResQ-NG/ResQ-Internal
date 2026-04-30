@@ -5,6 +5,12 @@ import { usePathname } from "next/navigation";
 import { Calendar, Bell, Zap, Sun, Moon } from "lucide-react";
 import { AppHeading, AppParagraph } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import {
+  INTERNAL_DASHBOARD_ROUTES,
+  isDashboardOverviewBreadcrumbPath,
+  isDashboardPathUnder,
+  isWorkspaceBreadcrumbPath,
+} from "@/lib/routes/internal-dashboard-routes";
 
 const THEME_STORAGE_KEY = "resq-theme";
 
@@ -46,11 +52,13 @@ export function DashboardHeader({
     }
   };
 
+  const R = INTERNAL_DASHBOARD_ROUTES;
+
   const breadcrumb = (() => {
-    if (pathname.startsWith("/overview/live-incidents")) {
-      return "Command Center / Live incidents";
+    if (isWorkspaceBreadcrumbPath(pathname)) {
+      return "Command Center / Workspace";
     }
-    if (pathname === "/dashboard" || pathname === "/overview") {
+    if (isDashboardOverviewBreadcrumbPath(pathname)) {
       return "Command Center / Overview";
     }
     if (pathname.startsWith("/media/")) {
@@ -70,19 +78,19 @@ export function DashboardHeader({
       if (pathname.startsWith("/agencies/settings")) return "Agencies / Settings";
       return "Agencies";
     }
-    if (pathname.startsWith("/dashboard/agencies")) {
+    if (isDashboardPathUnder(pathname, R.agencies.root)) {
       return "Agencies";
     }
-    if (pathname.startsWith("/dashboard/incidents")) {
+    if (isDashboardPathUnder(pathname, R.incidents.root)) {
       return "Incidents";
     }
-    if (pathname.startsWith("/dashboard/users")) {
+    if (isDashboardPathUnder(pathname, R.users.root)) {
       return "Users";
     }
-    if (pathname.startsWith("/dashboard/platform")) {
+    if (isDashboardPathUnder(pathname, R.platform.root)) {
       return "Platform";
     }
-    if (pathname.startsWith("/dashboard/settings")) {
+    if (isDashboardPathUnder(pathname, R.settings)) {
       return "Settings";
     }
     return "Command Center";

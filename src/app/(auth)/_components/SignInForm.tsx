@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { signIn } from "next-auth/react";
+import { Eye, EyeOff } from "lucide-react";
 import { AppButton, AppHeading, AppLink, AppParagraph } from "@/components/ui";
 import { showAppAlert } from "@/components/ui/AppAlert";
 
@@ -9,21 +11,38 @@ const fieldClass =
 
 export function SignInForm() {
   const [pending, setPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setPending(true);
     const form = e.currentTarget;
     const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
-    window.setTimeout(() => {
-      setPending(false);
-      showAppAlert("Wire this form to your auth provider (e.g. NextAuth credentials).", {
-        title: "Sign in",
-        description: email ? `Attempted: ${email}` : undefined,
-        variant: "info",
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+        callbackUrl: "/dashboard",
       });
-    }, 450);
+
+      if (!res) {
+        showAppAlert("Sign-in failed.", { title: "Sign in", variant: "error" });
+        return;
+      }
+
+      if (res.error) {
+        showAppAlert("Invalid credentials.", { title: "Sign in", variant: "error" });
+        return;
+      }
+
+      // Manual redirect keeps this component simple + avoids server/client mismatch.
+      window.location.assign(res.url ?? "/dashboard");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -69,15 +88,25 @@ export function SignInForm() {
               Forgot password?
             </AppLink>
           </div>
-          <input
-            id="auth-password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            placeholder="••••••••"
-            className={fieldClass}
-          />
+          <div className="relative">
+            <input
+              id="auth-password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              required
+              placeholder="••••••••"
+              className={`${fieldClass} pr-11`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-2 text-white/70 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue/35"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
       </div>
 

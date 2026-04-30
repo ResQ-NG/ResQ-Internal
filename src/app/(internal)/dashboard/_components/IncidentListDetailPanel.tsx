@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { AlertCircle, FileText, Filter, Radio } from "lucide-react";
 import { AppLink } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { INTERNAL_DASHBOARD_ROUTES } from "@/lib/routes/internal-dashboard-routes";
 import { incidentProcessTextClass, sampleUnattendedRows, type SampleInboxRow } from "./sampleCommandData";
 
 type FilterKind = "all" | "sos" | "report";
@@ -92,7 +93,7 @@ export function IncidentListDetailPanel({
 
       {/* Footer */}
       <div className="shrink-0 border-t border-captionDark/10 dark:border-captionDark-dark/15 px-4 py-2.5 flex justify-center">
-        <AppLink href="/dashboard/incidents/watch-me-sos" variant="muted" className="text-xs">
+        <AppLink href={INTERNAL_DASHBOARD_ROUTES.incidents.watchMeSos} variant="muted" className="text-xs">
           Open full incident queue →
         </AppLink>
       </div>

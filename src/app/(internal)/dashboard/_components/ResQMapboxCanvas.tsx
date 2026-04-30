@@ -117,8 +117,30 @@ export const ResQMapboxCanvas = forwardRef<
   const isDashboard = variant === "dashboard";
   const token = getMapboxAccessToken();
   const mapRef = useRef<MapRef>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
   const [internalSelected, setInternalSelected] = useState<Selected>(null);
   const [isDarkApp, setIsDarkApp] = useState(false);
+
+  const resizeMap = useCallback(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+    map.resize();
+    requestAnimationFrame(() => {
+      map.resize();
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    const el = hostRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => {
+      resizeMap();
+    });
+    ro.observe(el);
+    resizeMap();
+    return () => ro.disconnect();
+  }, [token, resizeMap, mapStyleId, variant]);
 
   // Expose imperative handle for parent fly-to
   useImperativeHandle(ref, () => ({
@@ -259,8 +281,9 @@ export const ResQMapboxCanvas = forwardRef<
 
   return (
     <div
+      ref={hostRef}
       className={cn(
-        "resq-mapbox-host relative min-h-0 flex-1",
+        "resq-mapbox-host relative isolate min-h-0 min-w-0 flex-1",
         spacious &&
           "[&_.mapboxgl-ctrl-top-right]:!top-5 [&_.mapboxgl-ctrl-top-right]:!right-5 [&_.mapboxgl-ctrl-bottom-right]:!bottom-8 [&_.mapboxgl-ctrl-bottom-right]:!right-5",
         isDashboard &&
@@ -281,6 +304,9 @@ export const ResQMapboxCanvas = forwardRef<
         attributionControl={false}
         reuseMaps
         cursor={showPopup ? "pointer" : "grab"}
+        onLoad={() => {
+          resizeMap();
+        }}
         onClick={() => {
           if (isDashboard) onSelectIncident?.(null);
           else setInternalSelected(null);

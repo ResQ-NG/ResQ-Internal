@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, TrendingDown, TrendingUp, UserCheck, UserPlus, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { INTERNAL_DASHBOARD_ROUTES } from "@/lib/routes/internal-dashboard-routes";
 import { SAMPLE_ANALYTICS } from "./sampleCommandData";
 
 type Metric = {
@@ -95,7 +96,7 @@ export function AnalyticsSnapshotSection() {
             Full analytics
           </p>
           <Link
-            href="/dashboard/platform"
+            href={INTERNAL_DASHBOARD_ROUTES.platform.root}
             className="flex items-center gap-1.5 rounded-lg bg-primary-blue px-3.5 py-2 text-xs font-metropolis-semibold text-white shadow-sm transition-opacity hover:opacity-90 dark:bg-primary-blue-dark"
           >
             View all

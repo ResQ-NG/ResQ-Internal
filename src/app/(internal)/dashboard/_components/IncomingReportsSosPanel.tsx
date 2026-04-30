@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ChevronDown, ChevronUp, FileText, Radio } from "lucide-react";
 import { AppHeading, AppLink, AppParagraph } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { INTERNAL_DASHBOARD_ROUTES } from "@/lib/routes/internal-dashboard-routes";
 import {
   SAMPLE_INBOX,
   incidentProcessTextClass,
@@ -103,7 +104,7 @@ export function IncomingReportsSosPanel({
                 {bodyOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </button>
             )}
-            <AppLink href="/dashboard/incidents/watch-me-sos" variant="primary" className="text-xs leading-none py-1.5">
+            <AppLink href={INTERNAL_DASHBOARD_ROUTES.incidents.watchMeSos} variant="primary" className="text-xs leading-none py-1.5">
               Open queue →
             </AppLink>
           </div>
@@ -194,7 +195,7 @@ export function IncomingReportsSosPanel({
           </div>
 
           <div className="mt-3 flex justify-center border-t border-captionDark/10 pt-3 dark:border-captionDark-dark/15">
-            <AppLink href="/dashboard/incidents/reports" variant="muted" className="text-xs">
+            <AppLink href={INTERNAL_DASHBOARD_ROUTES.incidents.reports} variant="muted" className="text-xs">
               All reports →
             </AppLink>
           </div>

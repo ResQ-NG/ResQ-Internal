@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { MAP_ACTIVITY_POINTS, MAP_PROJECT_POINTS } from "./mapSampleGeo";
 import { cn } from "@/lib/utils";
+import { INTERNAL_DASHBOARD_ROUTES } from "@/lib/routes/internal-dashboard-routes";
 
 export const COMMAND_STAT_KEYS = ["incidents", "projects", "team", "hotspot"] as const;
 export type CommandStatKey = (typeof COMMAND_STAT_KEYS)[number];
@@ -92,10 +93,10 @@ export function CommandCenterStatsPanel({
           {showWorkspaceLink ? (
             <div className="pointer-events-auto col-span-2 flex items-center justify-center border-t border-captionDark/10 pt-2 md:col-span-4 md:border-t-0 md:pt-0">
               <Link
-                href="/overview/map-workspace"
+                href={INTERNAL_DASHBOARD_ROUTES.workspace}
                 className="text-xs font-medium text-primary-blue transition-opacity hover:opacity-85 dark:text-primary-blue-dark"
               >
-                Open full map workspace →
+                Open workspace →
               </Link>
             </div>
           ) : null}
@@ -141,10 +142,10 @@ export function CommandCenterStatsPanel({
       {showWorkspaceLink ? (
         <div className="flex justify-center border-t border-captionDark/10 pt-2 dark:border-captionDark-dark/15">
           <Link
-            href="/overview/map-workspace"
+            href={INTERNAL_DASHBOARD_ROUTES.workspace}
             className="text-xs font-medium text-primary-blue transition-opacity hover:opacity-85 dark:text-primary-blue-dark"
           >
-            Open full map workspace →
+            Open workspace →
           </Link>
         </div>
       ) : null}
