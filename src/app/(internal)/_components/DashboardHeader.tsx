@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Calendar, Bell, Zap, Sun, Moon } from "lucide-react";
+import { Calendar, Bell, Zap, Sun, Moon, Wifi, WifiOff } from "lucide-react";
 import { AppHeading, AppParagraph } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import {
@@ -29,6 +29,7 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const pathname = usePathname();
   const [dark, setDark] = useState(true);
+  const [isOnline, setIsOnline] = useState(true);
 
   // Sync local dark state with document / localStorage
   useEffect(() => {
@@ -39,6 +40,20 @@ export function DashboardHeader({
     } catch {
       // ignore
     }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const sync = () => setIsOnline(navigator.onLine);
+    sync();
+
+    window.addEventListener("online", sync);
+    window.addEventListener("offline", sync);
+    return () => {
+      window.removeEventListener("online", sync);
+      window.removeEventListener("offline", sync);
+    };
   }, []);
 
   const toggleTheme = () => {
@@ -56,10 +71,10 @@ export function DashboardHeader({
 
   const breadcrumb = (() => {
     if (isWorkspaceBreadcrumbPath(pathname)) {
-      return "Command Center / Workspace";
+      return "Workspace";
     }
     if (isDashboardOverviewBreadcrumbPath(pathname)) {
-      return "Command Center / Overview";
+      return "Overview";
     }
     if (pathname.startsWith("/media/")) {
       if (pathname.startsWith("/media/overview")) return "Media / Overview";
@@ -106,6 +121,23 @@ export function DashboardHeader({
 
         {/* Right: quick actions */}
         <div className="flex items-center gap-2">
+          <div
+            className={cn(
+              "hidden items-center gap-2 rounded-full border bg-black/40 px-3 py-1.5 text-[11px] font-medium sm:flex",
+              isOnline
+                ? "border-success-green/30 text-success-green"
+                : "border-amber-400/30 text-amber-200"
+            )}
+            aria-label={isOnline ? "Network status: online" : "Network status: offline"}
+            title={isOnline ? "Online" : "Offline"}
+          >
+            {isOnline ? (
+              <Wifi className="h-3.5 w-3.5" aria-hidden />
+            ) : (
+              <WifiOff className="h-3.5 w-3.5" aria-hidden />
+            )}
+            <span>{isOnline ? "Online" : "Offline"}</span>
+          </div>
           <button
             type="button"
             className="hidden items-center gap-2 rounded-full border border-captionDark/40 bg-black/40 px-3 py-1.5 text-[11px] font-medium text-captionDark-dark hover:bg-black/60 sm:flex"

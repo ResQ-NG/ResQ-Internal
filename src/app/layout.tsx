@@ -5,7 +5,7 @@ import { AppProviders } from "./providers";
 
 export const metadata: Metadata = {
   title: "ResQ Internal",
-  description: "Talk to me",
+  description: "ResQ Internal dashboard",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",

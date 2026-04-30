@@ -35,6 +35,13 @@ export type SampleTripInfo = {
   checkIns: number;
 };
 
+export type IncidentCategoryBadge = {
+  title: string;
+  slug: string;
+  icon?: string;
+  color?: string;
+};
+
 export type SampleInboxRow = {
   id: string;
   kind: SampleInboxKind;
@@ -49,6 +56,18 @@ export type SampleInboxRow = {
   trip?: SampleTripInfo;
   reporterName?: string;
   phone?: string;
+  /** Evidence uploaded count when known (API reports). */
+  evidenceUploadedCount?: number;
+  /** Rich list of categories (icon + color) when available (e.g. from the API). */
+  categoryBadges?: IncidentCategoryBadge[];
+  /** Pulse indicator (e.g. AI flagged for human review). */
+  requiresHumanReview?: boolean;
+  /** Raw API status (separate from stage). */
+  statusLabel?: string;
+  /** Raw API processing stage (event type). */
+  stageRaw?: string;
+  /** Display-friendly stage label (Title Case). */
+  stageLabel?: string;
 };
 
 /** Shared sample inbox — keep in sync with UI that surfaces "needs attention". */

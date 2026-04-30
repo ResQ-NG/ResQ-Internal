@@ -299,6 +299,44 @@ export interface PaginatedResult<TData> {
   pageSize?: number;
 }
 
+/**
+ * Cursor-based pagination result returned by the backend.
+ * Shape: { items: TData[]; next_cursor: string | null }
+ */
+export interface CursorPaginatedResult<TData> {
+  items: TData[];
+  nextCursor: string | null;
+}
+
+export interface CursorInfiniteQueryConfig<TParams, TData> {
+  endpoint: string | ((params: TParams) => string);
+  queryKey: QueryKey;
+  operationName: string;
+  transformResponse?: (data: unknown) => TData;
+  getHeaders?: (params: TParams) => Record<string, string>;
+  getContextData?: (params: TParams) => Record<string, unknown>;
+  enabled?: (params: TParams) => boolean;
+  /**
+   * The query param name used to send the cursor to the backend.
+   * Defaults to `cursor`.
+   */
+  cursorParamKey?: string;
+  /**
+   * The field in the API response that contains the next cursor.
+   * Defaults to `next_cursor`.
+   */
+  nextCursorField?: string;
+  /**
+   * The field in the API response that contains the items array.
+   * Defaults to `items`.
+   */
+  dataField?: string;
+  /**
+   * Optional function to determine if there are more pages to fetch.
+   */
+  getHasNextPage?: (lastPage: unknown, allPages: unknown[]) => boolean;
+}
+
 export interface DefaultQueryParamsDTO {
   query?: string[] | string;
   page_size?: string | number;

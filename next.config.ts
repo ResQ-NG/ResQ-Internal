@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   async redirects() {
     const r = INTERNAL_DASHBOARD_ROUTES;
     const L = INTERNAL_DASHBOARD_ROUTE_LEGACY;

@@ -5,7 +5,7 @@
 export const INTERNAL_DASHBOARD_ROUTES = {
   root: "/dashboard",
   overview: "/dashboard/overview",
-  workspace: "/dashboard/overview/workspace",
+  workspace: "/dashboard/workspace",
   profile: "/dashboard/profile",
   agencies: {
     root: "/dashboard/agencies",
@@ -34,6 +34,7 @@ export const INTERNAL_DASHBOARD_ROUTE_LEGACY = {
   overviewRoot: "/overview",
   overviewMapWorkspace: "/overview/map-workspace",
   overviewLiveIncidents: "/overview/live-incidents",
+  dashboardOverviewWorkspace: "/dashboard/overview/workspace",
   dashboardMapWorkspace: "/dashboard/overview/map-workspace",
   dashboardLiveIncidents: "/dashboard/live-incidents",
   dashboardOverviewLiveIncidents: "/dashboard/overview/live-incidents",
@@ -44,29 +45,12 @@ export function isDashboardPathUnder(pathname: string, base: string): boolean {
   return pathname === base || pathname.startsWith(`${base}/`);
 }
 
-/** Command Center sidebar: home + `/dashboard/overview` subtree */
-export function isCommandCenterSectionActive(pathname: string): boolean {
-  const { root, overview } = INTERNAL_DASHBOARD_ROUTES;
-  return pathname === root || pathname === overview || pathname.startsWith(`${overview}/`);
-}
-
-/**
- * Sidebar child highlight. `/dashboard` (overview home) must not match deeper routes
- * like `/dashboard/overview/workspace`.
- */
-export function isDashboardNavChildActive(pathname: string, childHref: string): boolean {
-  const { root, overview } = INTERNAL_DASHBOARD_ROUTES;
-  if (childHref === root) {
-    return pathname === root || pathname === overview;
-  }
-  return pathname === childHref || pathname.startsWith(`${childHref}/`);
-}
-
 export function isWorkspaceBreadcrumbPath(pathname: string): boolean {
   const { workspace } = INTERNAL_DASHBOARD_ROUTES;
   const L = INTERNAL_DASHBOARD_ROUTE_LEGACY;
   return (
     isDashboardPathUnder(pathname, workspace) ||
+    isDashboardPathUnder(pathname, L.dashboardOverviewWorkspace) ||
     isDashboardPathUnder(pathname, L.dashboardMapWorkspace) ||
     isDashboardPathUnder(pathname, L.overviewMapWorkspace)
   );

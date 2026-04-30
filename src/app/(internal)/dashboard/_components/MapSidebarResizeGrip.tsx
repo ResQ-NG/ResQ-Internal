@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const MAP_SIDEBAR_LEFT = { min: 248, max: 400, default: 300 } as const;
+export const MAP_SIDEBAR_LEFT = { min: 320, max: 640, default: 420 } as const;
 export const MAP_SIDEBAR_RIGHT = { min: 280, max: 440, default: 360 } as const;
 
 export function useLgUp() {

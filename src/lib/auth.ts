@@ -66,7 +66,7 @@ export const authOptions: NextAuthOptions = {
         const baseUrl = apiBaseUrl();
         if (!baseUrl) return null;
 
-        const res = await fetch(`${baseUrl}/v1/users/login`, {
+        const res = await fetch(`${baseUrl}/v1/auth/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

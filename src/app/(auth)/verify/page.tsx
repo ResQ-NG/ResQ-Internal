@@ -12,10 +12,9 @@ type SearchParams = { token?: string | string[] };
 export default async function VerifyPage({
   searchParams,
 }: {
-  searchParams: Promise<SearchParams> | SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
-  const resolved = await Promise.resolve(searchParams);
-  const raw = resolved.token;
+  const { token: raw } = await searchParams;
   const token = Array.isArray(raw) ? raw[0] : raw;
 
   return (

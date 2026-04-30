@@ -1,5 +1,6 @@
 
 import {
+  InfiniteData,
   useInfiniteQuery,
   UseInfiniteQueryOptions,
   useMutation,
@@ -8,7 +9,14 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 
-import { InfiniteQueryConfig, MutationConfig, PaginatedResult, QueryConfig } from "./types";
+import {
+  CursorInfiniteQueryConfig,
+  CursorPaginatedResult,
+  InfiniteQueryConfig,
+  MutationConfig,
+  PaginatedResult,
+  QueryConfig,
+} from "./types";
 import { DefaultApiResponse } from "./types";
 import { useStore } from "@/store";
 import { logError } from "@/lib/logger";
@@ -88,7 +96,7 @@ export function useApiMutation<TVariables = unknown, TData = unknown>(
       callBack?.();
     },
     onError: (error: unknown) => {
-      // Check for ApiCustomError first to get the API message
+
       if (error instanceof ApiCustomError) {
         showError(error.message);
       } else {
@@ -142,7 +150,7 @@ export function useApiQuery<TParams = unknown, TData = unknown>(
         // Transform the response if a transformer is provided
         const data = config.transformResponse
           ? config.transformResponse(response?.data)
-          : response?.data;
+          : response?.data?.data;
 
         return data as TData;
       } catch (error: unknown) {
@@ -280,6 +288,114 @@ function useInfiniteApiQuery<TParams extends Record<string, unknown>, TData = un
   });
 }
 
+function useInfiniteCursorApiQuery<TParams extends object, TData = unknown>(
+  config: CursorInfiniteQueryConfig<TParams, TData>,
+  params?: TParams,
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      CursorPaginatedResult<TData>,
+      Error,
+      InfiniteData<CursorPaginatedResult<TData>>,
+      readonly unknown[],
+      string | null
+    >,
+    "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
+  >,
+  shouldShowError: boolean = DEFAULT_USE_QUERY_SHOW_ERROR
+) {
+  const setGeneralMessage = useStore(({ setGeneralMessage }) => setGeneralMessage);
+  const showError = (message: string) => setGeneralMessage({ message, state: "failed" });
+
+  const cursorParamKey = config.cursorParamKey || "cursor";
+  const nextCursorField = config.nextCursorField || "next_cursor";
+  const dataField = config.dataField || "items";
+
+  const queryKeyParts = [...config.queryKey];
+  if (params) {
+    Object.entries(params as Record<string, unknown>)
+      .filter(([, value]) => isValidQueryParam(value))
+      .sort(([a], [b]) => a.localeCompare(b))
+      .forEach(([key, value]) => {
+        if (Array.isArray(value)) queryKeyParts.push({ [key]: [...value].sort() });
+        else queryKeyParts.push({ [key]: value });
+      });
+  }
+
+  const finalQueryKey = queryKeyParts;
+  const isEnabled: boolean = config.enabled ? config.enabled(params as TParams) : true;
+
+  return useInfiniteQuery<
+    CursorPaginatedResult<TData>,
+    Error,
+    InfiniteData<CursorPaginatedResult<TData>>,
+    readonly unknown[],
+    string | null
+  >({
+    queryKey: finalQueryKey,
+    initialPageParam: null as string | null,
+    queryFn: async ({ pageParam }) => {
+      try {
+        const url: string =
+          typeof config.endpoint === "function"
+            ? config.endpoint(params as TParams)
+            : config.endpoint;
+
+        const headers: Record<string, string> = config.getHeaders?.(params as TParams) || {};
+
+        const requestParams: Record<string, unknown> = params
+          ? ({ ...(params as Record<string, unknown>) } as Record<string, unknown>)
+          : {};
+        if (pageParam) requestParams[cursorParamKey] = pageParam;
+
+        const response = await http.get(url, {
+          headers,
+          params: requestParams,
+        });
+
+        const responseData: Record<string, unknown> =
+          (response?.data as Record<string, unknown>) || {};
+        // Prefer the common `{ data: ... }` wrapper when present, but support direct payloads too.
+        const dataContainer: Record<string, unknown> =
+          (responseData.data as Record<string, unknown>) || responseData;
+
+        const itemsRaw: unknown = dataContainer[dataField];
+        const items: TData[] = Array.isArray(itemsRaw) ? (itemsRaw as TData[]) : [];
+
+        const transformedItems: TData[] =
+          typeof config.transformResponse === "function"
+            ? items.map(config.transformResponse)
+            : items;
+
+        const nextCursorVal = dataContainer[nextCursorField];
+        const nextCursor =
+          typeof nextCursorVal === "string"
+            ? nextCursorVal
+            : nextCursorVal == null
+              ? null
+              : String(nextCursorVal);
+
+        return { items: transformedItems, nextCursor };
+      } catch (error: unknown) {
+        logError(error, config.operationName, config.getContextData?.(params as TParams) || {});
+        if (shouldShowError) {
+          if (error instanceof ApiCustomError) showError(error.message);
+          else showError(apiError(error));
+        }
+        throw error;
+      }
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      if (typeof config.getHasNextPage === "function") {
+        const has = config.getHasNextPage(lastPage, allPages);
+        return has ? lastPage.nextCursor : undefined;
+      }
+      return lastPage.nextCursor ? lastPage.nextCursor : undefined;
+    },
+    ...options,
+    enabled: isEnabled && options?.enabled !== false,
+  });
+}
+
 /**
  * Creates a reusable API mutation hook with pre-configured settings.
  *
@@ -317,46 +433,42 @@ export function createApiMutation<TVariables = unknown, TData = unknown>(
   };
 }
 
+
+
 /**
- * Creates a reusable paginated API query hook with pre-configured settings.
+ * Cursor-based infinite query factory.
  *
- * This factory function allows you to define paginated query configurations once and reuse them
- * throughout your application, ensuring consistency in API interactions.
- *
- * @template TParams - The type of query search parameters used for the API request
- * @template TData - The type of data returned from the API
- *
- * @param config - Configuration object for the paginated query
- * @returns A function that returns a configured paginated query hook when called with search parameters
- *
- * @param params - Optional search parameters for the API request
- * @param options - Optional query options excluding 'queryKey', 'queryFn', and 'getNextPageParam'
- * @param shouldShowError - Flag to determine if errors should be displayed to the user, defaults to true
+ * Backend payload shape:
+ * `{ items: TData[]; next_cursor: string | null }`
  *
  * @example
- * // Define a typed paginated query hook
- * const useGetPaginatedUsers = createPaginatedApiQuery<{ page: number, limit: number }, UserData[]>({
- *   endpoint: '/api/users',
- *   queryKey: ['users'],
- *   operationName: 'GetPaginatedUsers'
+ * export const useInfiniteReports = createInfiniteCursorApiQuery<
+ *   { status?: string; cursor?: string },
+ *   Report
+ * >({
+ *   queryKey: ["reports"],
+ *   endpoint: "/v1/reports",
+ *   operationName: "List reports (cursor)",
  * });
- *
- * Use the hook in a component
- * const { data, isLoading, fetchNextPage } = useGetPaginatedUsers({ page: 1, limit: 10 });
- * The resulting URL would look like: /api/users?page=1&limit=10
  */
-export function createInfiniteApiQuery<
-  TParams extends Record<string, unknown> = Record<string, unknown>,
+export function createInfiniteCursorApiQuery<
+  TParams extends object = Record<string, unknown>,
   TData = unknown,
->(config: InfiniteQueryConfig<TParams, TData>) {
+>(config: CursorInfiniteQueryConfig<TParams, TData>) {
   return (
     params?: TParams,
     options?: Omit<
-      UseInfiniteQueryOptions<PaginatedResult<TData>, Error>,
-      "queryKey" | "queryFn" | "getNextPageParam"
+      UseInfiniteQueryOptions<
+        CursorPaginatedResult<TData>,
+        Error,
+        InfiniteData<CursorPaginatedResult<TData>>,
+        readonly unknown[],
+        string | null
+      >,
+      "queryKey" | "queryFn" | "getNextPageParam" | "initialPageParam"
     >,
     shouldShowError: boolean = DEFAULT_USE_QUERY_SHOW_ERROR
-  ) => useInfiniteApiQuery(config, params, options, shouldShowError);
+  ) => useInfiniteCursorApiQuery(config, params, options, shouldShowError);
 }
 
 /**

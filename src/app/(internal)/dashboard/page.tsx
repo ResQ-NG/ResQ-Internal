@@ -1,30 +1,6 @@
-import { DashboardHeader } from "../_components/DashboardHeader";
-import { DashboardWideMapSection } from "./_components/DashboardWideMapSection";
-import { StateHeatmapSection } from "./_components/StateHeatmapSection";
-import { AnalyticsSnapshotSection } from "./_components/AnalyticsSnapshotSection";
-import { PlatformHealthSection } from "./_components/PlatformHealthSection";
+import { redirect } from "next/navigation";
+import { INTERNAL_DASHBOARD_ROUTES } from "@/lib/routes/internal-dashboard-routes";
 
-export default function DashboardOverviewPage() {
-  return (
-    <>
-      <DashboardHeader
-        title="Command Overview"
-        dateRange="Live · updated in real-time"
-      />
-
-      <div className="p-6 space-y-6">
-        {/* Analytics snapshot strip */}
-        <AnalyticsSnapshotSection />
-
-        {/* Platform health */}
-        <PlatformHealthSection />
-
-        {/* State-level heatmap */}
-        <StateHeatmapSection />
-
-        {/* Command map (same shell as Workspace) */}
-        <DashboardWideMapSection />
-      </div>
-    </>
-  );
+export default function DashboardRootPage() {
+  redirect(INTERNAL_DASHBOARD_ROUTES.overview);
 }

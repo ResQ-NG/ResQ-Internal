@@ -1,4 +1,4 @@
-//TODO: later on tweak this based off next auth configuration for our specific use case
+// Auth: NextAuth session `accessToken` is synced in AppProviders; requests use `Authorization: Bearer <token>`.
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 import { API_URL } from "@/config/environment-config";
 import { ApiCustomError } from "@/lib/types";
@@ -15,9 +15,13 @@ const http: AxiosInstance = axios.create({
   },
 });
 
+function authorizationHeader(token: string) {
+  return `Bearer ${token}`;
+}
+
 export const setAuthToken = (token: string) => {
   authToken = token;
-  http.defaults.headers.common["Authorization"] = `Token ${token}`;
+  http.defaults.headers.common["Authorization"] = authorizationHeader(token);
 };
 
 export const clearAuthToken = () => {
@@ -52,9 +56,9 @@ http.interceptors.request.use(
       await waitForToken();
     }
 
-    // Set Authorization header if token is valid
+    // Set Authorization header if token is valid (JWT / OAuth-style Bearer)
     if (authToken && authToken !== "undefined") {
-      config.headers.Authorization = `Token ${authToken}`;
+      config.headers.Authorization = authorizationHeader(authToken);
     }
 
     return config;
@@ -82,10 +86,14 @@ http.interceptors.response.use(
         openError("401", "Your session has expired. Please sign in again.");
       }
     } else if (status === 403) {
-      // Trigger global error modal for 403
       if (typeof window !== "undefined") {
         const { openError } = useGlobalErrorStore.getState();
-        openError("403", "You don't have permission to perform this action.");
+        const serverMsg = typeof data?.message === "string" && data.message.trim() ? data.message.trim() : null;
+        openError(
+          "403",
+          serverMsg ??
+            "You don’t have permission for this action. If you need access, ask an administrator to update your role.",
+        );
       }
     } else if (status === 500) {
       // Trigger global error modal for 500

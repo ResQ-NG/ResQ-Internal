@@ -13,34 +13,59 @@ import {
 import { AppGlassSkeleton } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { getMapboxAccessToken } from "@/lib/mapbox-env";
+import type { MapStyleId } from "@/lib/mapbox-env";
 import { IncidentDetailCard } from "./IncidentDetailCard";
 import { IncidentListDetailPanel } from "./IncidentListDetailPanel";
-import { MAP_SIDEBAR_LEFT, SidebarResizeGrip, useLgUp } from "./MapSidebarResizeGrip";
+import {
+  MAP_SIDEBAR_LEFT,
+  SidebarResizeGrip,
+  useLgUp,
+} from "./MapSidebarResizeGrip";
 import { MAP_UNATTENDED_POINTS } from "./mapSampleGeo";
+import type { SampleInboxRow } from "./sampleCommandData";
 import { type ResQMapboxCanvasRef } from "./ResQMapboxCanvas";
+import { useMapWorkspaceStore, type MapWorkspaceFilterKind } from "@/store/map-workspace-store";
 
 const ResQMapboxCanvas = dynamic(
   () => import("./ResQMapboxCanvas").then((m) => m.ResQMapboxCanvas),
   {
     ssr: false,
     loading: () => (
-      <AppGlassSkeleton className="h-full min-h-[380px]" caption="Loading map…" showOrb lines={3} />
+      <AppGlassSkeleton
+        className="h-full min-h-[380px]"
+        caption="Loading map…"
+        showOrb
+        lines={3}
+      />
     ),
-  },
+  }
 );
 
-type MapStyleId = "streets" | "satellite" | "outdoors" | "navigation-day" | "navigation-night";
-type FilterKind = "all" | "sos" | "report";
-
-const STYLE_OPTIONS: { id: MapStyleId; label: string; icon: React.ReactNode }[] = [
+const STYLE_OPTIONS: {
+  id: MapStyleId;
+  label: string;
+  icon: React.ReactNode;
+}[] = [
   { id: "streets", label: "Streets", icon: <Map className="h-3 w-3" /> },
   { id: "outdoors", label: "Outdoors", icon: <Mountain className="h-3 w-3" /> },
-  { id: "navigation-day", label: "Nav Day", icon: <Compass className="h-3 w-3" /> },
-  { id: "navigation-night", label: "Nav Night", icon: <Compass className="h-3 w-3" /> },
-  { id: "satellite", label: "Satellite", icon: <Satellite className="h-3 w-3" /> },
+  {
+    id: "navigation-day",
+    label: "Nav Day",
+    icon: <Compass className="h-3 w-3" />,
+  },
+  {
+    id: "navigation-night",
+    label: "Nav Night",
+    icon: <Compass className="h-3 w-3" />,
+  },
+  {
+    id: "satellite",
+    label: "Satellite",
+    icon: <Satellite className="h-3 w-3" />,
+  },
 ];
 
-const FILTER_OPTIONS: { id: FilterKind; label: string; dot?: string }[] = [
+const FILTER_OPTIONS: { id: MapWorkspaceFilterKind; label: string; dot?: string }[] = [
   { id: "all", label: "All" },
   { id: "sos", label: "SOS", dot: "bg-accent-red" },
   { id: "report", label: "Reports", dot: "bg-primary-blue" },
@@ -55,29 +80,26 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
   const lgUp = useLgUp();
   const mapRef = useRef<ResQMapboxCanvasRef>(null);
 
-  const [leftWidth, setLeftWidth] = useState<number>(MAP_SIDEBAR_LEFT.default);
+  const leftWidth = useMapWorkspaceStore((s) => s.leftSidebarWidth);
+  const setLeftWidth = useMapWorkspaceStore((s) => s.setLeftSidebarWidth);
+  const mapStyleId = useMapWorkspaceStore((s) => s.mapStyleId);
+  const setMapStyleId = useMapWorkspaceStore((s) => s.setMapStyleId);
+  const filterKind = useMapWorkspaceStore((s) => s.filterKind);
+  const setFilterKind = useMapWorkspaceStore((s) => s.setFilterKind);
 
-  const [mapStyleId, setMapStyleId] = useState<MapStyleId>("streets");
-  const [filterKind, setFilterKind] = useState<FilterKind>("all");
-
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedRow, setSelectedRow] = useState<SampleInboxRow | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
 
-  const selectedRow = selectedId
-    ? MAP_UNATTENDED_POINTS.find((p) => p.id === selectedId) ?? null
-    : null;
-
-  const leftStyle =
-    lgUp
-      ? ({
-          width: leftWidth,
-          minWidth: MAP_SIDEBAR_LEFT.min,
-          maxWidth: MAP_SIDEBAR_LEFT.max,
-        } as const)
-      : undefined;
+  const leftStyle = lgUp
+    ? ({
+        width: leftWidth,
+        minWidth: MAP_SIDEBAR_LEFT.min,
+        maxWidth: MAP_SIDEBAR_LEFT.max,
+      } as const)
+    : undefined;
 
   const handleSearch = useCallback(
     async (e: React.FormEvent) => {
@@ -89,7 +111,7 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
       setSearchError("");
       try {
         const res = await fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${token}&limit=1&country=ng`,
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${token}&limit=1&country=ng`
         );
         const data = await res.json();
         const feature = data?.features?.[0];
@@ -105,16 +127,18 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
         setSearching(false);
       }
     },
-    [searchQuery],
+    [searchQuery]
   );
 
   const handleSelectIncident = useCallback((id: string | null) => {
-    setSelectedId(id);
-    if (id) {
-      const point = MAP_UNATTENDED_POINTS.find((p) => p.id === id);
-      if (point) {
-        mapRef.current?.flyTo(point.lng, point.lat, 13);
-      }
+    if (!id) {
+      setSelectedRow(null);
+      return;
+    }
+    const point = MAP_UNATTENDED_POINTS.find((p) => p.id === id);
+    setSelectedRow(point ?? null);
+    if (point) {
+      mapRef.current?.flyTo(point.lng, point.lat, 13);
     }
   }, []);
 
@@ -122,13 +146,13 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
     <section
       className={cn(
         "flex min-h-[min(560px,calc(100vh-10rem))] flex-col overflow-hidden rounded-2xl border border-captionDark/20 bg-surface-light shadow-sm dark:border-captionDark-dark/20 dark:bg-surface-dark lg:min-h-[min(86dvh,56rem)] lg:flex-row",
-        className,
+        className
       )}
     >
       <div
         className={cn(
           "relative flex shrink-0 flex-col overflow-hidden border-captionDark/20 transition-[width] duration-300 ease-out dark:border-captionDark-dark/20",
-          "h-[min(62vh,460px)] w-full border-b lg:h-full lg:border-b-0 lg:border-r",
+          "h-[min(62vh,460px)] w-full border-b lg:h-full lg:border-b-0 lg:border-r"
         )}
         style={leftStyle}
       >
@@ -145,8 +169,14 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <IncidentListDetailPanel
-            selectedId={selectedId}
-            onSelectId={handleSelectIncident}
+            selectedRow={selectedRow}
+            onSelectRow={(row) => {
+              setSelectedRow(row);
+              if (row) {
+                const point = MAP_UNATTENDED_POINTS.find((p) => p.id === row.id);
+                if (point) mapRef.current?.flyTo(point.lng, point.lat, 13);
+              }
+            }}
           />
         </div>
       </div>
@@ -157,7 +187,10 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
             onSubmit={handleSearch}
             className="flex items-center gap-1.5 rounded-xl border border-captionDark/20 bg-surface-light shadow-lg dark:border-captionDark-dark/30 dark:bg-surface-dark"
           >
-            <Search className="ml-3 h-4 w-4 shrink-0 text-captionDark dark:text-captionDark-dark" aria-hidden />
+            <Search
+              className="ml-3 h-4 w-4 shrink-0 text-captionDark dark:text-captionDark-dark"
+              aria-hidden
+            />
             <input
               type="search"
               placeholder="Search location (e.g. Lekki, Abuja)…"
@@ -195,7 +228,7 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
                   "flex items-center gap-1.5 border-r border-captionDark/15 px-3 py-2 text-[11px] font-metropolis-semibold transition-all duration-150 last:border-r-0 dark:border-captionDark-dark/20",
                   mapStyleId === id
                     ? "bg-primary-blue text-white dark:bg-primary-blue-dark"
-                    : "text-captionDark hover:bg-captionDark/8 hover:text-primaryDark dark:text-captionDark-dark dark:hover:bg-captionDark-dark/10 dark:hover:text-primaryDark-dark",
+                    : "text-captionDark hover:bg-captionDark/8 hover:text-primaryDark dark:text-captionDark-dark dark:hover:bg-captionDark-dark/10 dark:hover:text-primaryDark-dark"
                 )}
                 aria-pressed={mapStyleId === id}
                 aria-label={`${label} map style`}
@@ -206,10 +239,16 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
             ))}
           </div>
 
-          <div className="hidden h-4 w-px bg-captionDark/20 dark:bg-captionDark-dark/25 sm:block" aria-hidden />
+          <div
+            className="hidden h-4 w-px bg-captionDark/20 dark:bg-captionDark-dark/25 sm:block"
+            aria-hidden
+          />
 
           <div className="flex items-center overflow-hidden rounded-xl border border-captionDark/20 bg-surface-light shadow-md dark:border-captionDark-dark/30 dark:bg-surface-dark">
-            <SlidersHorizontal className="mx-3 h-3 w-3 shrink-0 text-captionDark dark:text-captionDark-dark" aria-hidden />
+            <SlidersHorizontal
+              className="mx-3 h-3 w-3 shrink-0 text-captionDark dark:text-captionDark-dark"
+              aria-hidden
+            />
             {FILTER_OPTIONS.map(({ id, label, dot }) => (
               <button
                 key={id}
@@ -219,11 +258,13 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
                   "flex items-center gap-1.5 border-l border-captionDark/15 px-3 py-2 text-[11px] font-metropolis-semibold transition-all duration-150 dark:border-captionDark-dark/20",
                   filterKind === id
                     ? "bg-primary-blue/15 text-primary-blue dark:bg-primary-blue-dark/20 dark:text-primary-blue-dark"
-                    : "text-captionDark hover:bg-captionDark/8 hover:text-primaryDark dark:text-captionDark-dark dark:hover:bg-captionDark-dark/10 dark:hover:text-primaryDark-dark",
+                    : "text-captionDark hover:bg-captionDark/8 hover:text-primaryDark dark:text-captionDark-dark dark:hover:bg-captionDark-dark/10 dark:hover:text-primaryDark-dark"
                 )}
                 aria-pressed={filterKind === id}
               >
-                {dot && <span className={cn("h-1.5 w-1.5 rounded-full", dot)} />}
+                {dot && (
+                  <span className={cn("h-1.5 w-1.5 rounded-full", dot)} />
+                )}
                 {label}
               </button>
             ))}
@@ -235,7 +276,7 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
             <IncidentDetailCard
               row={selectedRow}
               embedded
-              onClose={() => setSelectedId(null)}
+              onClose={() => setSelectedRow(null)}
             />
           </div>
         )}
@@ -248,7 +289,7 @@ export function CommandMapWorkspace({ className }: CommandMapWorkspaceProps) {
               variant="dashboard"
               mapStyleId={mapStyleId}
               visibleLayers={{ projects: false, team: false, incidents: true }}
-              selectedIncidentId={selectedId}
+              selectedIncidentId={selectedRow?.id ?? null}
               onSelectIncident={handleSelectIncident}
               filterKind={filterKind}
               className="h-full w-full min-h-0 min-w-0"

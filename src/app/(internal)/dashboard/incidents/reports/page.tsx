@@ -15,11 +15,12 @@ export default function IncidentReportsPage() {
             Reports
           </AppHeading>
           <AppParagraph variant="caption" className="mb-4">
-            Filtered view of incident reports (excluding Watch Me and SOS).
+            Staff reports are listed in the dashboard incident list (“Needs attention”). Use the main dashboard or
+            Incident queue for the full view.
           </AppParagraph>
-          <div className="flex h-64 items-center justify-center rounded-lg border border-captionDark/15 dark:border-captionDark-dark/15 bg-surface-light/80 dark:bg-primaryDark/10">
-            <AppParagraph variant="caption">
-              Reports table placeholder
+          <div className="flex min-h-32 items-center justify-center rounded-lg border border-captionDark/15 dark:border-captionDark-dark/15 bg-surface-light/80 dark:bg-primaryDark/10 px-4">
+            <AppParagraph variant="caption" className="text-center">
+              See the incident sidebar on the dashboard overview for live staff reports.
             </AppParagraph>
           </div>
         </section>
