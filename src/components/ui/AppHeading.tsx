@@ -1,14 +1,22 @@
 import { createElement } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-export interface AppHeadingProps
-  extends React.HTMLAttributes<HTMLHeadingElement> {
+export interface AppHeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
   as?: HeadingLevel;
   /** Visual size / weight – does not change DOM element by default */
   size?: "xl" | "lg" | "md" | "sm";
-  weight?: "thin" | "extralight" | "light" | "regular" | "medium" | "semibold" | "bold" | "extrabold" | "black";
+  weight?:
+    | "thin"
+    | "extralight"
+    | "light"
+    | "regular"
+    | "medium"
+    | "semibold"
+    | "bold"
+    | "extrabold"
+    | "black";
   className?: string;
   children: React.ReactNode;
 }

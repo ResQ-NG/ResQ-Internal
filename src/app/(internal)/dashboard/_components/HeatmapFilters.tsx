@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 import { SearchableDropdown } from "./SearchableDropdown";
 
 export function HeatmapFilters({
@@ -58,7 +58,10 @@ export function HeatmapFilters({
       {/* City filter (only when grouping by city) */}
       {groupBy === "city" ? (
         <div
-          className={cn("hidden items-center gap-2 sm:flex", !stateFilter && "opacity-50")}
+          className={cn(
+            "hidden items-center gap-2 sm:flex",
+            !stateFilter && "opacity-50"
+          )}
         >
           <span className="text-[11px] font-metropolis-semibold text-captionDark dark:text-captionDark-dark">
             City
@@ -69,7 +72,9 @@ export function HeatmapFilters({
             disabled={!stateFilter}
             options={citiesForState
               .map((c) => (c.city?.trim() ? c.city : ""))
-              .filter((city, idx, arr) => city !== "" && arr.indexOf(city) === idx)
+              .filter(
+                (city, idx, arr) => city !== "" && arr.indexOf(city) === idx
+              )
               .map((city) => ({ value: city, label: city }))}
             ariaLabel="Filter by city"
             emptyLabel="All cities"
@@ -80,4 +85,3 @@ export function HeatmapFilters({
     </div>
   );
 }
-

@@ -1,17 +1,22 @@
 "use client";
 
 import { forwardRef } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
-export interface AppInputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
+export interface AppInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "size"
+> {
   leftIcon?: React.ReactNode;
   rightAdornment?: React.ReactNode;
   containerClassName?: string;
 }
 
 export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
-  ({ leftIcon, rightAdornment, className, containerClassName, ...props }, ref) => {
+  (
+    { leftIcon, rightAdornment, className, containerClassName, ...props },
+    ref
+  ) => {
     return (
       <div
         className={cn(
@@ -36,11 +41,12 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
           )}
           {...props}
         />
-        {rightAdornment ? <div className="shrink-0">{rightAdornment}</div> : null}
+        {rightAdornment ? (
+          <div className="shrink-0">{rightAdornment}</div>
+        ) : null}
       </div>
     );
   }
 );
 
 AppInput.displayName = "AppInput";
-

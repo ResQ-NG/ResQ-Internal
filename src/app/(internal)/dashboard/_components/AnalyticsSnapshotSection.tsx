@@ -1,12 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ArrowRight, TrendingDown, TrendingUp } from "lucide-react";
+import { cn } from "@/lib/utils/generics";
 import { INTERNAL_DASHBOARD_ROUTES } from "@/lib/routes/internal-dashboard-routes";
 import { AppGlassSkeleton } from "@/components/ui";
 import { AppError } from "@/components/ui/AppError";

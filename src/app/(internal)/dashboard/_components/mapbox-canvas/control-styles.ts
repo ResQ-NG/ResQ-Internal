@@ -1,0 +1,5 @@
+export const MAP_CANVAS_CONTROL_BTN =
+  "flex h-9 w-9 items-center justify-center rounded-lg border border-captionDark/20 bg-surface-light/95 text-primaryDark shadow-sm backdrop-blur-md transition-colors hover:bg-primary-blue/10 hover:border-primary-blue/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue dark:border-captionDark-dark/30 dark:bg-surface-dark/95 dark:text-primaryDark-dark dark:hover:bg-primary-blue-dark/15 dark:hover:border-primary-blue-dark/50 dark:focus-visible:ring-primary-blue-dark dark:ring-offset-surface-dark";
+
+export const MAP_CANVAS_CONTROL_BTN_WORKSPACE =
+  "flex h-10 w-10 items-center justify-center rounded-xl border border-captionDark/20 bg-surface-light/95 text-primaryDark shadow-md backdrop-blur-md transition-colors hover:bg-primary-blue/10 hover:border-primary-blue/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-blue dark:border-captionDark-dark/30 dark:bg-surface-dark/95 dark:text-primaryDark-dark dark:hover:bg-primary-blue-dark/15 dark:hover:border-primary-blue-dark/50 dark:focus-visible:ring-primary-blue-dark dark:ring-offset-surface-dark";

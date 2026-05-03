@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AppButton, AppHeading, AppLink, AppParagraph } from "@/components/ui";
 import { showAppAlert } from "@/components/ui/AppAlert";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 type Phase = "pending" | "success";
 
@@ -63,10 +63,13 @@ export function VerifyPanel({ token }: { token?: string }) {
     setResendPending(true);
     window.setTimeout(() => {
       setResendPending(false);
-      showAppAlert("Verification link sent (demo). Connect to your mailer for production.", {
-        title: "Resend",
-        variant: "info",
-      });
+      showAppAlert(
+        "Verification link sent (demo). Connect to your mailer for production.",
+        {
+          title: "Resend",
+          variant: "info",
+        }
+      );
     }, 500);
   }
 

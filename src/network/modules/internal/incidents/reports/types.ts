@@ -164,6 +164,9 @@ export type ReportListItemDTO = {
   stage_label?: string;
   stage: ReportEventType | string;
   location_label?: string;
+  /** Optional location coordinates when backend provides them. */
+  latitude?: number;
+  longitude?: number;
   uploaded_evidence: number;
 };
 
@@ -190,7 +193,7 @@ export interface ReportQueryParamsDTO {
   search?: string;
 }
 
-export interface ReportSimplifiedDTO {
+export interface ReportDetailDTO {
   categories: ReportCategoryDTO[];
   created_at: string;
   deep_inference_results: ReportDeepInferenceResultDTO[];

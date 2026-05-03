@@ -3,13 +3,44 @@ import type {
   SampleInboxRow,
   SampleProcess,
 } from "../_components/sampleCommandData";
-import { formatRelativeShort } from "@/lib/format-relative-short";
+import { formatRelativeShort } from "@/lib/utils/generics";
 import type { ReportListItemDTO } from "@/network/modules/internal/incidents/reports/types";
 import { REPORT_EVENT_TYPES, type ReportEventType } from "@/network/modules/internal/incidents/reports/constants";
 import {
   humanizeReportEventType,
   normalizeReportCategoryLabel,
 } from "@/network/modules/internal/incidents/reports/utils";
+import { INBOX_ROW_KIND } from "@/lib/constants/incident-inbox";
+
+function toFiniteNumber(v: unknown): number | undefined {
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string" && v.trim() !== "") {
+    const n = Number(v);
+    if (Number.isFinite(n)) return n;
+  }
+  return undefined;
+}
+
+/** Best-effort lat/lng from list payload (camelCase, snake_case, or nested `location`). */
+function listItemCoordinates(r: ReportListItemDTO): { lat?: number; lng?: number } {
+  const raw = r as Record<string, unknown>;
+  const loc = raw.location as Record<string, unknown> | undefined;
+  const lat =
+    toFiniteNumber(r.latitude) ??
+    toFiniteNumber(raw.lat) ??
+    toFiniteNumber(raw.latitude) ??
+    (loc &&
+      (toFiniteNumber(loc.latitude) ??
+        toFiniteNumber(loc.lat)));
+  const lng =
+    toFiniteNumber(r.longitude) ??
+    toFiniteNumber(raw.lng) ??
+    toFiniteNumber(raw.longitude) ??
+    (loc &&
+      (toFiniteNumber(loc.longitude) ??
+        toFiniteNumber(loc.lng)));
+  return { lat, lng };
+}
 
 /** Map raw event-stage string to the visual `process` chip. */
 function mapStageToProcess(stageRaw: string): SampleProcess {
@@ -52,10 +83,14 @@ export function reportSimplifiedToSampleInboxRow(r: ReportListItemDTO): SampleIn
   }));
 
   const fallbackCategory = normalizeReportCategoryLabel(r.category_label);
+  const { lat, lng } = listItemCoordinates(r);
 
   return {
     id: `api-report-${r.id}`,
-    kind: "report",
+    apiReportId: r.id,
+    lat,
+    lng,
+    kind: INBOX_ROW_KIND.REPORT,
     summary: title || `Report #${r.id}`,
     created: formatRelativeShort(r.display_date),
     evidenceUploadedCount: r.uploaded_evidence ?? 0,

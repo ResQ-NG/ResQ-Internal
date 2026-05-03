@@ -1,4 +1,4 @@
-import type { AuthUserProfile } from "@/lib/auth";
+import type { AuthUserProfile } from "@/lib/utils/auth";
 import type { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
@@ -14,4 +14,3 @@ declare module "next-auth/jwt" {
     profile?: AuthUserProfile;
   }
 }
-

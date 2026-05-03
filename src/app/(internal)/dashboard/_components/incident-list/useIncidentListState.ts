@@ -1,29 +1,43 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { flattenCursorItems } from "@/components/ui/InfiniteCursorList";
 import { useDebouncedValue } from "@/lib/hooks/use-debounced-value";
 import { useIntersectFetchNext } from "@/lib/hooks/use-intersect-fetch-next";
 import { useInfiniteReports } from "@/network/modules/internal/incidents/reports/queries";
 import { reportSimplifiedToSampleInboxRow } from "@/app/(internal)/dashboard/_utils/report-to-sample-inbox";
-import { sampleUnattendedRows, type SampleInboxRow } from "../sampleCommandData";
+import type { SampleInboxRow } from "../sampleCommandData";
+import { INBOX_LIST_FILTER } from "@/lib/constants/incident-inbox";
 import type { IncidentListFilterKind } from "./incident-list.types";
+
+const LIVE_MAP_REFETCH_MS = 15_000;
 
 export function useIncidentListState({
   useLiveReports,
+  mapLiveMode = false,
 }: {
   useLiveReports: boolean;
+  /** When true with live reports, periodically refetches so map + list stay current. */
+  mapLiveMode?: boolean;
 }) {
-  const [filter, setFilter] = useState<IncidentListFilterKind>("all");
+  // Workspace (and modern dashboard) is API-backed; keep the UI focused on reports.
+  const [filter, setFilter] = useState<IncidentListFilterKind>(
+    useLiveReports ? INBOX_LIST_FILTER.REPORT : INBOX_LIST_FILTER.ALL,
+  );
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebouncedValue(query.trim(), 300);
 
   const liveQuery = useInfiniteReports(
     {
-      limit: 10,
+      limit: 100,
       search: debouncedQuery ? debouncedQuery : undefined,
     },
-    { enabled: useLiveReports },
+    {
+      enabled: useLiveReports,
+      refetchInterval:
+        useLiveReports && mapLiveMode ? LIVE_MAP_REFETCH_MS : false,
+      refetchIntervalInBackground: true,
+    },
   );
 
   const allScrollRef = useRef<HTMLDivElement>(null);
@@ -34,40 +48,21 @@ export function useIncidentListState({
     [liveQuery.data],
   );
 
-  const sosRows = useMemo(
-    () => sampleUnattendedRows().filter((r) => r.kind === "sos"),
-    [],
-  );
+  // Workspace: no demo SOS/legacy rows.
+  const legacyRowsFiltered = useMemo(() => [] as SampleInboxRow[], []);
+  const sosRowsFiltered = useMemo(() => [] as SampleInboxRow[], []);
 
-  const legacyRows = useMemo(() => {
-    const all = sampleUnattendedRows();
-    if (filter === "sos") return all.filter((r) => r.kind === "sos");
-    if (filter === "report") return all.filter((r) => r.kind === "report");
-    return all;
-  }, [filter]);
-
-  const q = query.trim().toLowerCase();
-  const matches = useCallback(
-    (row: SampleInboxRow) => {
-      if (!q) return true;
-      const hay = [row.summary, row.category ?? "", row.locationLabel ?? "", row.reporterName ?? ""]
-        .join(" ")
-        .toLowerCase();
-      return hay.includes(q);
-    },
-    [q],
-  );
-
-  const legacyRowsFiltered = useMemo(() => legacyRows.filter(matches), [legacyRows, matches]);
-  const sosRowsFiltered = useMemo(() => sosRows.filter(matches), [sosRows, matches]);
   // Reports search is backend-driven; don't double-filter client-side.
   const apiRowsFiltered = apiRows;
 
   const sosCount = sosRowsFiltered.length;
-  const legacyReportCount = sampleUnattendedRows().filter((r) => r.kind === "report").length;
-  const reportCount = useLiveReports ? apiRowsFiltered.length : legacyReportCount;
+  const reportCount = apiRowsFiltered.length;
   const badgeCount =
-    filter === "sos" ? sosCount : filter === "report" ? reportCount : sosCount + reportCount;
+    filter === INBOX_LIST_FILTER.SOS
+      ? sosCount
+      : filter === INBOX_LIST_FILTER.REPORT
+        ? reportCount
+        : sosCount + reportCount;
 
   useIntersectFetchNext({
     rootRef: allScrollRef,
@@ -75,7 +70,11 @@ export function useIncidentListState({
     hasNextPage: liveQuery.hasNextPage,
     isFetchingNextPage: liveQuery.isFetchingNextPage ?? false,
     fetchNextPage: liveQuery.fetchNextPage,
-    enabled: useLiveReports && filter === "all" && !liveQuery.isError && !liveQuery.isLoading,
+    enabled:
+      useLiveReports &&
+      filter === INBOX_LIST_FILTER.ALL &&
+      !liveQuery.isError &&
+      !liveQuery.isLoading,
   });
 
   return {
@@ -84,7 +83,6 @@ export function useIncidentListState({
     query,
     setQuery,
     liveQuery,
-    matches,
     apiRows,
     apiRowsFiltered,
     sosRowsFiltered,

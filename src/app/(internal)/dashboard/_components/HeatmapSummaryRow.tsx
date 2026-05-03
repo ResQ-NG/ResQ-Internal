@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 export function HeatmapSummaryRow({
   label,
@@ -27,4 +27,3 @@ export function HeatmapSummaryRow({
     </div>
   );
 }
-

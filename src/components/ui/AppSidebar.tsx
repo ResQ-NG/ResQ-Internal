@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { gsap } from "gsap";
 import { useUIStore } from "@/store/ui-store";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 export function AppSidebarRoot() {
   const { sidebarOpen, sidebarConfig, closeSidebar } = useUIStore();
@@ -81,7 +81,10 @@ export function AppSidebarRoot() {
         <div className="h-full overflow-y-auto px-4 py-4 text-sm text-primaryDark-dark">
           {sidebarConfig.content ?? (
             <p className="text-captionDark-dark">
-              Use <code className="rounded bg-black/20 px-1 py-0.5 text-[11px]">openSidebar(&#123; content &#125;)</code>{" "}
+              Use{" "}
+              <code className="rounded bg-black/20 px-1 py-0.5 text-[11px]">
+                openSidebar(&#123; content &#125;)
+              </code>{" "}
               to inject any JSX into this global glass sidebar.
             </p>
           )}
@@ -90,4 +93,3 @@ export function AppSidebarRoot() {
     </div>
   );
 }
-

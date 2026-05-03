@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AppLottie } from "@/components/ui";
 import type { LottieAnimationData } from "@/components/ui";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 interface LottieLogoProps {
   /** Size: default 48 (w-48 h-48), use "sm" for sidebar (w-10 h-10) */

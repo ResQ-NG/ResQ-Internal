@@ -1,7 +1,7 @@
 "use client";
 
 import { Inbox } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 import { AppHeading } from "./AppHeading";
 import { AppParagraph } from "./AppParagraph";
 
@@ -31,7 +31,11 @@ export function AppEmpty({
       <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-captionDark/10 text-captionDark dark:bg-captionDark-dark/15 dark:text-captionDark-dark">
         <Icon className="h-5 w-5" aria-hidden />
       </div>
-      <AppHeading as={3} size="sm" className="text-primaryDark dark:text-primaryDark-dark">
+      <AppHeading
+        as={3}
+        size="sm"
+        className="text-primaryDark dark:text-primaryDark-dark"
+      >
         {title}
       </AppHeading>
       {description ? (
@@ -43,4 +47,3 @@ export function AppEmpty({
     </div>
   );
 }
-

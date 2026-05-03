@@ -16,7 +16,7 @@ import {
   Moon,
   Bell,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 import { useUIStore } from "@/store/ui-store";
 
 const THEME_STORAGE_KEY = "resq-theme";
@@ -113,12 +113,19 @@ export function MediaSidebar() {
       </button>
 
       {/* Logo + badge */}
-      <div className={cn("mb-8 flex shrink-0 flex-col gap-2", expanded ? "w-full px-3" : "items-center")}>
+      <div
+        className={cn(
+          "mb-8 flex shrink-0 flex-col gap-2",
+          expanded ? "w-full px-3" : "items-center"
+        )}
+      >
         <Link
           href="/media/overview"
           className={cn(
             "flex shrink-0 overflow-hidden rounded-lg transition-colors hover:bg-primary-blue/10",
-            expanded ? "flex-row items-start gap-3" : "h-10 w-10 items-center justify-center"
+            expanded
+              ? "flex-row items-start gap-3"
+              : "h-10 w-10 items-center justify-center"
           )}
           aria-label="ResQ Media"
         >
@@ -127,7 +134,9 @@ export function MediaSidebar() {
           </span>
           {expanded && (
             <div className="flex min-w-0 flex-col gap-1">
-              <span className="truncate text-sm font-metropolis-semibold text-white">ResQ</span>
+              <span className="truncate text-sm font-metropolis-semibold text-white">
+                ResQ
+              </span>
               <span
                 className="inline-flex w-fit rounded-full border border-white/30 bg-white/10 px-2 py-0.5 text-[10px] font-metropolis-semibold uppercase tracking-wider text-white/90"
                 aria-hidden
@@ -221,11 +230,12 @@ export function MediaSidebar() {
         >
           <Bell className="h-4 w-4 shrink-0" />
           {expanded && (
-            <span className="truncate text-sm font-metropolis-medium">Alerts</span>
+            <span className="truncate text-sm font-metropolis-medium">
+              Alerts
+            </span>
           )}
         </button>
       </div>
     </aside>
   );
 }
-

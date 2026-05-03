@@ -17,7 +17,7 @@ import {
   User,
   LogOut,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 import {
   INTERNAL_DASHBOARD_ROUTES,
   isDashboardPathUnder,

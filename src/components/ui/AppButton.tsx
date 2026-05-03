@@ -1,9 +1,8 @@
 import { forwardRef } from "react";
 import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
-export interface AppButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface AppButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "accent" | "success" | "surface" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
   /** Use for Next.js links styled as buttons */

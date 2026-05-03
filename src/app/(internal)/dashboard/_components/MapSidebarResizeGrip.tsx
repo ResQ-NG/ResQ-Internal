@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { GripVertical } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 export const MAP_SIDEBAR_LEFT = { min: 320, max: 640, default: 420 } as const;
 export const MAP_SIDEBAR_RIGHT = { min: 280, max: 440, default: 360 } as const;
@@ -64,7 +64,7 @@ export function SidebarResizeGrip({
       window.addEventListener("pointerup", onUp);
       window.addEventListener("pointercancel", onUp);
     },
-    [max, min, onWidthChange, side, width],
+    [max, min, onWidthChange, side, width]
   );
 
   return (
@@ -76,13 +76,13 @@ export function SidebarResizeGrip({
       className={cn(
         "group absolute top-0 z-[560] flex h-full min-w-[2.75rem] max-w-[2.75rem] shrink-0 touch-none items-center justify-center px-2",
         "cursor-col-resize select-none",
-        side === "left" ? "-right-3" : "-left-3",
+        side === "left" ? "-right-3" : "-left-3"
       )}
     >
       <span
         className={cn(
           "h-[min(72%,10rem)] w-1 rounded-full border border-captionDark/15 bg-surface-light/90 shadow-sm transition-[background-color,transform] dark:border-captionDark-dark/25 dark:bg-surface-dark/90",
-          "group-hover:scale-y-[1.02] group-hover:bg-primary-blue/25 group-active:bg-primary-blue/35 dark:group-hover:bg-primary-blue-dark/30 dark:group-active:bg-primary-blue-dark/40",
+          "group-hover:scale-y-[1.02] group-hover:bg-primary-blue/25 group-active:bg-primary-blue/35 dark:group-hover:bg-primary-blue-dark/30 dark:group-active:bg-primary-blue-dark/40"
         )}
       />
       <GripVertical

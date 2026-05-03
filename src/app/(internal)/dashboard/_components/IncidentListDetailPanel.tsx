@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { INTERNAL_DASHBOARD_ROUTES } from "@/lib/routes/internal-dashboard-routes";
 import { AppLink } from "@/components/ui";
 import { IncidentListHeader } from "./incident-list/IncidentListHeader";
@@ -7,17 +8,44 @@ import { IncidentListContent } from "./incident-list/IncidentListContent";
 import { useIncidentListState } from "./incident-list/useIncidentListState";
 import type { IncidentListDetailPanelProps } from "./incident-list/incident-list.types";
 import type { SampleInboxRow } from "./sampleCommandData";
+import { IncidentDetailCard } from "./IncidentDetailCard";
+import { useMapWorkspaceStore } from "@/store/map-workspace-store";
 
 export function IncidentListDetailPanel({
   selectedRow,
   onSelectRow,
+  onApiRowsChange,
   useLiveReports = false,
+  showDetailInPanel = false,
 }: IncidentListDetailPanelProps) {
-  const state = useIncidentListState({ useLiveReports });
+  const mapLiveMode = useMapWorkspaceStore((s) => s.mapLiveMode);
+  const state = useIncidentListState({
+    useLiveReports,
+    mapLiveMode: useLiveReports ? mapLiveMode : false,
+  });
+
+  useEffect(() => {
+    onApiRowsChange?.(state.apiRows);
+  }, [onApiRowsChange, state.apiRows]);
 
   const handleRowClick = (row: SampleInboxRow) => {
     onSelectRow?.(selectedRow?.id === row.id ? null : row);
   };
+
+  const handleBack = () => onSelectRow?.(null);
+
+  // In panel-detail mode: replace the body with IncidentDetailCard
+  if (showDetailInPanel && selectedRow) {
+    return (
+      <div className="flex h-full min-h-0 flex-col overflow-hidden bg-surface-light dark:bg-surface-dark">
+        <IncidentDetailCard
+          row={selectedRow}
+          embedded
+          onBack={handleBack}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-surface-light dark:bg-surface-dark">
@@ -56,11 +84,11 @@ export function IncidentListDetailPanel({
 
       <div className="flex shrink-0 items-center justify-center border-t border-captionDark/10 px-4 py-2.5 dark:border-captionDark-dark/15">
         <AppLink
-          href={INTERNAL_DASHBOARD_ROUTES.incidents.watchMeSos}
+          href={INTERNAL_DASHBOARD_ROUTES.incidents.reports}
           variant="muted"
           className="text-xs"
         >
-          Open full incident queue →
+          Open full reports queue →
         </AppLink>
       </div>
     </div>

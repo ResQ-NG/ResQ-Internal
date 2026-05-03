@@ -1,4 +1,6 @@
-export type SampleInboxKind = "report" | "sos";
+import { INBOX_ROW_KIND, type InboxRowKind } from "@/lib/constants/incident-inbox";
+
+export type SampleInboxKind = InboxRowKind;
 
 export type SampleProcess = "pending triage" | "routing" | "assigned" | "in progress" | "resolved";
 
@@ -68,13 +70,18 @@ export type SampleInboxRow = {
   stageRaw?: string;
   /** Display-friendly stage label (Title Case). */
   stageLabel?: string;
+  /** Numeric report id from the API list (used to fetch full detail). */
+  apiReportId?: number;
+  /** Optional coordinates (used to render markers on the workspace map). */
+  lat?: number;
+  lng?: number;
 };
 
 /** Shared sample inbox — keep in sync with UI that surfaces "needs attention". */
 export const SAMPLE_INBOX: SampleInboxRow[] = [
   {
     id: "r-901",
-    kind: "report",
+    kind: INBOX_ROW_KIND.REPORT,
     summary: "Road blockage — third mainland bridge, multiple lanes affected",
     created: "6 min ago",
     category: null,
@@ -88,7 +95,7 @@ export const SAMPLE_INBOX: SampleInboxRow[] = [
   },
   {
     id: "s-204",
-    kind: "sos",
+    kind: INBOX_ROW_KIND.SOS,
     summary: "Watch Me session · user 8821 — active trip, no check-in for 18 min",
     created: "9 min ago",
     category: null,
@@ -105,7 +112,7 @@ export const SAMPLE_INBOX: SampleInboxRow[] = [
   },
   {
     id: "r-900",
-    kind: "report",
+    kind: INBOX_ROW_KIND.REPORT,
     summary: "Flooding near Balogun market — water level rising",
     created: "14 min ago",
     category: "Weather",
@@ -118,7 +125,7 @@ export const SAMPLE_INBOX: SampleInboxRow[] = [
   },
   {
     id: "s-203",
-    kind: "sos",
+    kind: INBOX_ROW_KIND.SOS,
     summary: "SOS · silent alarm triggered — user unresponsive",
     created: "22 min ago",
     category: null,
@@ -136,7 +143,7 @@ export const SAMPLE_INBOX: SampleInboxRow[] = [
   },
   {
     id: "r-899",
-    kind: "report",
+    kind: INBOX_ROW_KIND.REPORT,
     summary: "Medical emergency — unresponsive person at bus stop",
     created: "31 min ago",
     category: null,
@@ -149,7 +156,7 @@ export const SAMPLE_INBOX: SampleInboxRow[] = [
   },
   {
     id: "r-898",
-    kind: "report",
+    kind: INBOX_ROW_KIND.REPORT,
     summary: "Power line hazard — fallen cable across road",
     created: "48 min ago",
     category: "Infrastructure",
@@ -163,7 +170,7 @@ export const SAMPLE_INBOX: SampleInboxRow[] = [
   },
   {
     id: "s-202",
-    kind: "sos",
+    kind: INBOX_ROW_KIND.SOS,
     summary: "Watch Me session ended · user confirmed OK",
     created: "1h ago",
     category: "Watch Me",
@@ -175,7 +182,7 @@ export const SAMPLE_INBOX: SampleInboxRow[] = [
   },
   {
     id: "r-897",
-    kind: "report",
+    kind: INBOX_ROW_KIND.REPORT,
     summary: "Armed robbery in progress — two suspects, residential area",
     created: "1h 12m ago",
     category: null,
@@ -188,7 +195,7 @@ export const SAMPLE_INBOX: SampleInboxRow[] = [
   },
   {
     id: "s-201",
-    kind: "sos",
+    kind: INBOX_ROW_KIND.SOS,
     summary: "Watch Me · user 7742 — late check-in, session still active",
     created: "1h 28m ago",
     category: null,
@@ -204,7 +211,7 @@ export const SAMPLE_INBOX: SampleInboxRow[] = [
   },
   {
     id: "r-896",
-    kind: "report",
+    kind: INBOX_ROW_KIND.REPORT,
     summary: "Gas leak near school — fumes reported by teachers",
     created: "2h ago",
     category: null,
@@ -228,7 +235,7 @@ export function sampleInboxAttentionCount(): number {
 /** Rows that appear on the map — unattended SOS and uncategorized reports */
 export function sampleUnattendedRows(): SampleInboxRow[] {
   return SAMPLE_INBOX.filter(
-    (r) => r.category === null || r.kind === "sos"
+    (r) => r.category === null || r.kind === INBOX_ROW_KIND.SOS
   );
 }
 

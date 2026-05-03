@@ -1,10 +1,9 @@
 "use client";
 
 import NextLink from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
-export interface AppLinkProps
-  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface AppLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   href: string;
   variant?: "default" | "primary" | "accent" | "muted";
   underline?: boolean;
@@ -15,8 +14,7 @@ export interface AppLinkProps
 }
 
 const variantClasses: Record<NonNullable<AppLinkProps["variant"]>, string> = {
-  default:
-    "text-primaryDark dark:text-primaryDark-dark hover:opacity-80",
+  default: "text-primaryDark dark:text-primaryDark-dark hover:opacity-80",
   primary:
     "text-primary-blue dark:text-primary-blue-dark hover:opacity-90 font-medium",
   accent:
@@ -40,7 +38,12 @@ export function AppLink({
     underline && "underline underline-offset-2"
   );
 
-  if (internal && !href.startsWith("http") && !href.startsWith("mailto:") && !href.startsWith("tel:")) {
+  if (
+    internal &&
+    !href.startsWith("http") &&
+    !href.startsWith("mailto:") &&
+    !href.startsWith("tel:")
+  ) {
     return (
       <NextLink href={href} className={cn(base, className)} {...rest}>
         {children}

@@ -1,4 +1,3 @@
-
 import {
   InfiniteData,
   useInfiniteQuery,
@@ -21,8 +20,8 @@ import { DefaultApiResponse } from "./types";
 import { useStore } from "@/store";
 import { logError } from "@/lib/logger";
 import http from "./http.instance";
-import { ApiCustomError } from "@/lib/types";
-import { apiError } from "@/lib/utils";
+import { ApiCustomError } from "@/lib/dto/http";
+import { apiError } from "@/lib/utils/generics";
 
 const DEFAULT_USE_QUERY_SHOW_ERROR = true;
 
@@ -30,7 +29,9 @@ export function useApiMutation<TVariables = unknown, TData = unknown>(
   config: MutationConfig<TVariables, TData>,
   callBack?: () => void
 ) {
-  const setGeneralMessage = useStore(({ setGeneralMessage }) => setGeneralMessage);
+  const setGeneralMessage = useStore(
+    ({ setGeneralMessage }) => setGeneralMessage
+  );
 
   const queryClient = useQueryClient();
 
@@ -53,7 +54,9 @@ export function useApiMutation<TVariables = unknown, TData = unknown>(
       const data = config.transformRequest?.(variables) || variables;
 
       const endpoint =
-        typeof config.endpoint === "function" ? config.endpoint(variables) : config.endpoint;
+        typeof config.endpoint === "function"
+          ? config.endpoint(variables)
+          : config.endpoint;
 
       try {
         const isDelete = method.toLowerCase() === "delete";
@@ -62,14 +65,22 @@ export function useApiMutation<TVariables = unknown, TData = unknown>(
         if (isDelete) {
           response = await http[method](endpoint, { headers });
         } else {
-          response = await http[method](endpoint, data as Record<string, unknown>, { headers });
+          response = await http[method](
+            endpoint,
+            data as Record<string, unknown>,
+            { headers }
+          );
         }
 
         return config.transformResponse
           ? config.transformResponse(response?.data)
           : (response?.data as TData);
       } catch (error: unknown) {
-        logError(error, config.operationName, config.getContextData?.(variables) || {});
+        logError(
+          error,
+          config.operationName,
+          config.getContextData?.(variables) || {}
+        );
         throw error;
       }
     },
@@ -96,7 +107,6 @@ export function useApiMutation<TVariables = unknown, TData = unknown>(
       callBack?.();
     },
     onError: (error: unknown) => {
-
       if (error instanceof ApiCustomError) {
         showError(error.message);
       } else {
@@ -113,14 +123,19 @@ export function useApiQuery<TParams = unknown, TData = unknown>(
   options?: Omit<UseQueryOptions<TData, Error, TData>, "queryKey" | "queryFn">,
   shouldShowError: boolean = DEFAULT_USE_QUERY_SHOW_ERROR
 ) {
-  const setGeneralMessage = useStore(({ setGeneralMessage }) => setGeneralMessage);
+  const setGeneralMessage = useStore(
+    ({ setGeneralMessage }) => setGeneralMessage
+  );
 
-  const showError = (message: string) => setGeneralMessage({ message, state: "failed" });
+  const showError = (message: string) =>
+    setGeneralMessage({ message, state: "failed" });
 
   const queryKeyParts = [...config.queryKey]; // e.g., ['basekey']
   if (params) {
     Object.entries(params)
-      .filter(([, value]) => value !== undefined && value !== null && value !== "")
+      .filter(
+        ([, value]) => value !== undefined && value !== null && value !== ""
+      )
       .sort(([a], [b]) => a.localeCompare(b))
       .forEach(([key, value]) => {
         queryKeyParts.push({ [key]: value });
@@ -154,7 +169,11 @@ export function useApiQuery<TParams = unknown, TData = unknown>(
 
         return data as TData;
       } catch (error: unknown) {
-        logError(error, config.operationName, config.getContextData?.(params as TParams));
+        logError(
+          error,
+          config.operationName,
+          config.getContextData?.(params as TParams)
+        );
         if (shouldShowError) {
           // Check for ApiCustomError first to get the API message
           if (error instanceof ApiCustomError) {
@@ -173,7 +192,10 @@ export function useApiQuery<TParams = unknown, TData = unknown>(
   });
 }
 
-function useInfiniteApiQuery<TParams extends Record<string, unknown>, TData = unknown>(
+function useInfiniteApiQuery<
+  TParams extends Record<string, unknown>,
+  TData = unknown,
+>(
   config: InfiniteQueryConfig<TParams, TData>,
   params?: TParams,
   options?: Omit<
@@ -182,9 +204,12 @@ function useInfiniteApiQuery<TParams extends Record<string, unknown>, TData = un
   >,
   shouldShowError: boolean = DEFAULT_USE_QUERY_SHOW_ERROR
 ) {
-  const setGeneralMessage = useStore(({ setGeneralMessage }) => setGeneralMessage);
+  const setGeneralMessage = useStore(
+    ({ setGeneralMessage }) => setGeneralMessage
+  );
 
-  const showError = (message: string) => setGeneralMessage({ message, state: "failed" });
+  const showError = (message: string) =>
+    setGeneralMessage({ message, state: "failed" });
 
   const pageParamKey: string = config.pageParamKey || "page";
   const dataField: string = config.dataField || "items";
@@ -207,7 +232,9 @@ function useInfiniteApiQuery<TParams extends Record<string, unknown>, TData = un
 
   const finalQueryKey = queryKeyParts;
 
-  const isEnabled: boolean = config.enabled ? config.enabled(params as TParams) : true;
+  const isEnabled: boolean = config.enabled
+    ? config.enabled(params as TParams)
+    : true;
 
   return useInfiniteQuery({
     queryKey: finalQueryKey,
@@ -219,7 +246,8 @@ function useInfiniteApiQuery<TParams extends Record<string, unknown>, TData = un
             ? config.endpoint(params as TParams)
             : config.endpoint;
 
-        const headers: Record<string, string> = config.getHeaders?.(params as TParams) || {};
+        const headers: Record<string, string> =
+          config.getHeaders?.(params as TParams) || {};
 
         const requestParams: Record<string, unknown> = {
           ...(params || {}),
@@ -248,7 +276,8 @@ function useInfiniteApiQuery<TParams extends Record<string, unknown>, TData = un
         const dataContainer: Record<string, unknown> =
           (responseData.data as Record<string, unknown>) || {};
 
-        const meta: Record<string, unknown> = (dataContainer.meta as Record<string, unknown>) || {};
+        const meta: Record<string, unknown> =
+          (dataContainer.meta as Record<string, unknown>) || {};
 
         const items: TData[] = (dataContainer[dataField] as TData[]) || [];
 
@@ -267,7 +296,11 @@ function useInfiniteApiQuery<TParams extends Record<string, unknown>, TData = un
           pageSize: (meta.page_size as number) || undefined,
         };
       } catch (error: unknown) {
-        logError(error, config.operationName, config.getContextData?.(params as TParams) || {});
+        logError(
+          error,
+          config.operationName,
+          config.getContextData?.(params as TParams) || {}
+        );
         if (shouldShowError) {
           // Check for ApiCustomError first to get the API message
           if (error instanceof ApiCustomError) {
@@ -281,7 +314,9 @@ function useInfiniteApiQuery<TParams extends Record<string, unknown>, TData = un
     },
     getNextPageParam: (lastPage) => {
       if (!lastPage?.totalPages) return undefined;
-      return (lastPage.currentPage ?? 0) < lastPage.totalPages ? lastPage.nextPage : undefined;
+      return (lastPage.currentPage ?? 0) < lastPage.totalPages
+        ? lastPage.nextPage
+        : undefined;
     },
     ...options,
     enabled: isEnabled && options?.enabled !== false,
@@ -303,8 +338,11 @@ function useInfiniteCursorApiQuery<TParams extends object, TData = unknown>(
   >,
   shouldShowError: boolean = DEFAULT_USE_QUERY_SHOW_ERROR
 ) {
-  const setGeneralMessage = useStore(({ setGeneralMessage }) => setGeneralMessage);
-  const showError = (message: string) => setGeneralMessage({ message, state: "failed" });
+  const setGeneralMessage = useStore(
+    ({ setGeneralMessage }) => setGeneralMessage
+  );
+  const showError = (message: string) =>
+    setGeneralMessage({ message, state: "failed" });
 
   const cursorParamKey = config.cursorParamKey || "cursor";
   const nextCursorField = config.nextCursorField || "next_cursor";
@@ -316,13 +354,16 @@ function useInfiniteCursorApiQuery<TParams extends object, TData = unknown>(
       .filter(([, value]) => isValidQueryParam(value))
       .sort(([a], [b]) => a.localeCompare(b))
       .forEach(([key, value]) => {
-        if (Array.isArray(value)) queryKeyParts.push({ [key]: [...value].sort() });
+        if (Array.isArray(value))
+          queryKeyParts.push({ [key]: [...value].sort() });
         else queryKeyParts.push({ [key]: value });
       });
   }
 
   const finalQueryKey = queryKeyParts;
-  const isEnabled: boolean = config.enabled ? config.enabled(params as TParams) : true;
+  const isEnabled: boolean = config.enabled
+    ? config.enabled(params as TParams)
+    : true;
 
   return useInfiniteQuery<
     CursorPaginatedResult<TData>,
@@ -340,10 +381,14 @@ function useInfiniteCursorApiQuery<TParams extends object, TData = unknown>(
             ? config.endpoint(params as TParams)
             : config.endpoint;
 
-        const headers: Record<string, string> = config.getHeaders?.(params as TParams) || {};
+        const headers: Record<string, string> =
+          config.getHeaders?.(params as TParams) || {};
 
         const requestParams: Record<string, unknown> = params
-          ? ({ ...(params as Record<string, unknown>) } as Record<string, unknown>)
+          ? ({ ...(params as Record<string, unknown>) } as Record<
+              string,
+              unknown
+            >)
           : {};
         if (pageParam) requestParams[cursorParamKey] = pageParam;
 
@@ -359,7 +404,9 @@ function useInfiniteCursorApiQuery<TParams extends object, TData = unknown>(
           (responseData.data as Record<string, unknown>) || responseData;
 
         const itemsRaw: unknown = dataContainer[dataField];
-        const items: TData[] = Array.isArray(itemsRaw) ? (itemsRaw as TData[]) : [];
+        const items: TData[] = Array.isArray(itemsRaw)
+          ? (itemsRaw as TData[])
+          : [];
 
         const transformedItems: TData[] =
           typeof config.transformResponse === "function"
@@ -376,7 +423,11 @@ function useInfiniteCursorApiQuery<TParams extends object, TData = unknown>(
 
         return { items: transformedItems, nextCursor };
       } catch (error: unknown) {
-        logError(error, config.operationName, config.getContextData?.(params as TParams) || {});
+        logError(
+          error,
+          config.operationName,
+          config.getContextData?.(params as TParams) || {}
+        );
         if (shouldShowError) {
           if (error instanceof ApiCustomError) showError(error.message);
           else showError(apiError(error));
@@ -432,8 +483,6 @@ export function createApiMutation<TVariables = unknown, TData = unknown>(
     return useApiMutation(finalConfig, callback);
   };
 }
-
-
 
 /**
  * Cursor-based infinite query factory.
@@ -500,9 +549,13 @@ export function createInfiniteCursorApiQuery<
 export function createApiQuery<TParams = unknown, TData = unknown>(
   config: QueryConfig<TParams, TData>,
   shouldShowError?: boolean,
-  options: Omit<UseQueryOptions<TData, Error, TData>, "queryKey" | "queryFn"> = {}
+  options: Omit<
+    UseQueryOptions<TData, Error, TData>,
+    "queryKey" | "queryFn"
+  > = {}
 ) {
-  return (params?: TParams) => useApiQuery(config, params, options, shouldShowError);
+  return (params?: TParams) =>
+    useApiQuery(config, params, options, shouldShowError);
 }
 
 /**
@@ -555,7 +608,8 @@ export function createPaginatedApiResponse<TParams = unknown, TData = unknown>(
           const responseDataContainer = data || {};
 
           // Extract items from the dataField (default: 'results')
-          const items: TData[] = (responseDataContainer[dataField] as TData[]) || [];
+          const items: TData[] =
+            (responseDataContainer[dataField] as TData[]) || [];
 
           // For DRF-style pagination, meta fields are at the root level
           const currentPage = 1; // DRF does not provide current page by default
@@ -565,7 +619,8 @@ export function createPaginatedApiResponse<TParams = unknown, TData = unknown>(
               ? responseDataContainer["results"].length
               : 0;
           const totalItems = (responseDataContainer["count"] as number) || 0;
-          const totalPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 1;
+          const totalPages =
+            pageSize > 0 ? Math.ceil(totalItems / pageSize) : 1;
 
           // DRF provides 'next' and 'previous' URLs, so we infer nextPage
           const nextUrl = responseDataContainer["next"] as string | null;

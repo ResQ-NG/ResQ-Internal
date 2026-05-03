@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { gsap } from "gsap";
 import { useUIStore } from "@/store/ui-store";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 const sizeClasses: Record<"sm" | "md" | "lg", string> = {
   sm: "max-w-sm",
@@ -116,4 +116,3 @@ export function AppModalRoot() {
     </div>
   );
 }
-

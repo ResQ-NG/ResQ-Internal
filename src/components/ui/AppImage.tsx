@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { ImageProps } from "next/image";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 export interface AppImageProps extends Omit<ImageProps, "className"> {
   /** Optional wrapper class (e.g. for aspect ratio or max size) */
@@ -17,11 +17,7 @@ export function AppImage({
 }: AppImageProps) {
   return (
     <span className={cn("relative block overflow-hidden", wrapperClassName)}>
-      <Image
-        alt={alt}
-        className={cn("object-cover", className)}
-        {...rest}
-      />
+      <Image alt={alt} className={cn("object-cover", className)} {...rest} />
     </span>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 import { CommandMapWorkspace } from "./CommandMapWorkspace";
 
 export type MapWorkspaceShellProps = {
@@ -14,11 +14,6 @@ export type MapWorkspaceShellProps = {
  */
 export function MapWorkspaceShell({ className }: MapWorkspaceShellProps) {
   return (
-    <CommandMapWorkspace
-      className={cn(
-        "min-h-0 w-full flex-1 lg:min-h-[calc(100dvh-9.5rem)]",
-        className,
-      )}
-    />
+    <CommandMapWorkspace className={cn("min-h-0 w-full flex-1", className)} />
   );
 }

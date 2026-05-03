@@ -2,7 +2,7 @@
 
 import Lottie, { type LottieRefCurrentProps } from "lottie-react";
 import { useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 /** Lottie animation JSON (from LottieFiles, After Effects, etc.) */
 export type LottieAnimationData = object;

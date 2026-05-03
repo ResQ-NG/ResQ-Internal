@@ -3,17 +3,20 @@
 import type { ReactNode, Key } from "react";
 import { useRef } from "react";
 import { Loader2 } from "lucide-react";
-import type { InfiniteData, UseInfiniteQueryResult } from "@tanstack/react-query";
+import type {
+  InfiniteData,
+  UseInfiniteQueryResult,
+} from "@tanstack/react-query";
 import type { CursorPaginatedResult } from "@/network/types";
 import { useIntersectFetchNext } from "@/lib/hooks/use-intersect-fetch-next";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 import { AppButton } from "./AppButton";
 import { AppEmpty } from "./AppEmpty";
 import { AppError } from "./AppError";
 import { AppParagraph } from "./AppParagraph";
 
 export function flattenCursorItems<T>(
-  data: InfiniteData<CursorPaginatedResult<T>> | undefined,
+  data: InfiniteData<CursorPaginatedResult<T>> | undefined
 ): T[] {
   return data?.pages.flatMap((p) => p.items) ?? [];
 }
@@ -32,7 +35,7 @@ export type InfiniteCursorListProps<TItem> = {
     | "refetch"
   >;
   flatten?: (
-    data: InfiniteData<CursorPaginatedResult<TItem>> | undefined,
+    data: InfiniteData<CursorPaginatedResult<TItem>> | undefined
   ) => TItem[];
   getItemKey: (item: TItem) => Key;
   renderItem: (item: TItem, index: number) => ReactNode;
@@ -78,7 +81,7 @@ export function InfiniteCursorList<TItem>({
     return (
       <div
         className={cn(
-          "flex min-h-[160px] flex-1 items-center justify-center rounded-xl border border-captionDark/15 bg-surface-light/80 dark:border-captionDark-dark/15 dark:bg-primaryDark/10",
+          "flex min-h-[160px] flex-1 items-center justify-center rounded-xl border border-captionDark/15 bg-surface-light/80 dark:border-captionDark-dark/15 dark:bg-primaryDark/10"
         )}
       >
         <AppParagraph variant="caption">{loadingMessage}</AppParagraph>
@@ -109,7 +112,9 @@ export function InfiniteCursorList<TItem>({
   }
 
   return (
-    <div className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}>
+    <div
+      className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", className)}
+    >
       {footerSummary ? (
         <div className="mb-2 shrink-0">{footerSummary}</div>
       ) : null}
@@ -118,7 +123,7 @@ export function InfiniteCursorList<TItem>({
         ref={scrollRootRef}
         className={cn(
           "min-h-0 flex-1 overflow-y-auto overscroll-contain",
-          scrollAreaClassName,
+          scrollAreaClassName
         )}
       >
         <div className="grid gap-2.5">
@@ -135,8 +140,13 @@ export function InfiniteCursorList<TItem>({
 
         {query.isFetchingNextPage ? (
           <div className="flex items-center justify-center gap-2 py-3 text-captionDark dark:text-captionDark-dark">
-            <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" aria-hidden />
-            <span className="text-[11px] font-metropolis-medium">Loading more…</span>
+            <Loader2
+              className="h-3.5 w-3.5 animate-spin shrink-0"
+              aria-hidden
+            />
+            <span className="text-[11px] font-metropolis-medium">
+              Loading more…
+            </span>
           </div>
         ) : !query.hasNextPage ? (
           <p className="py-3 text-center text-[10px] uppercase tracking-wide text-captionDark/70 dark:text-captionDark-dark/70">

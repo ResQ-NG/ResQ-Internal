@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 export type SearchableDropdownOption = { value: string; label: string };
 
@@ -34,7 +34,9 @@ export function SearchableDropdown({
   const [query, setQuery] = useState("");
 
   const selectedLabel =
-    value === "" ? emptyLabel : options.find((o) => o.value === value)?.label ?? value;
+    value === ""
+      ? emptyLabel
+      : (options.find((o) => o.value === value)?.label ?? value);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -79,8 +81,15 @@ export function SearchableDropdown({
           inputClassName
         )}
       >
-        <span className="min-w-0 truncate">{selectedLabel || placeholder || emptyLabel}</span>
-        <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 opacity-70 transition-transform", open && "rotate-180")} />
+        <span className="min-w-0 truncate">
+          {selectedLabel || placeholder || emptyLabel}
+        </span>
+        <ChevronDown
+          className={cn(
+            "h-3.5 w-3.5 shrink-0 opacity-70 transition-transform",
+            open && "rotate-180"
+          )}
+        />
       </button>
 
       {open ? (
@@ -90,7 +99,10 @@ export function SearchableDropdown({
           aria-label={ariaLabel}
         >
           <div className="flex items-center gap-2 border-b border-captionDark/10 px-3 py-2 dark:border-captionDark-dark/15">
-            <Search className="h-3.5 w-3.5 text-captionDark dark:text-captionDark-dark" aria-hidden />
+            <Search
+              className="h-3.5 w-3.5 text-captionDark dark:text-captionDark-dark"
+              aria-hidden
+            />
             <input
               ref={inputRef}
               value={query}
@@ -177,4 +189,3 @@ function OptionRow({
     </button>
   );
 }
-

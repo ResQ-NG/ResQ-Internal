@@ -1,13 +1,18 @@
 "use client";
 
 import { AlertTriangle, Info, ShieldAlert } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
 export type AppErrorVariant = "error" | "warning" | "info";
 
 const VARIANT_STYLES: Record<
   AppErrorVariant,
-  { border: string; bg: string; text: string; icon: React.ComponentType<{ className?: string }> }
+  {
+    border: string;
+    bg: string;
+    text: string;
+    icon: React.ComponentType<{ className?: string }>;
+  }
 > = {
   error: {
     border: "border-accent-red/25 dark:border-accent-red-dark/25",
@@ -61,7 +66,9 @@ export function AppError({
         className
       )}
     >
-      <div className={cn("flex items-start gap-2.5", compact && "items-center")}>
+      <div
+        className={cn("flex items-start gap-2.5", compact && "items-center")}
+      >
         <span
           className={cn(
             "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
@@ -81,7 +88,9 @@ export function AppError({
             className={cn(
               "text-xs leading-snug",
               title ? "mt-0.5" : "",
-              compact ? styles.text : "text-captionDark dark:text-captionDark-dark"
+              compact
+                ? styles.text
+                : "text-captionDark dark:text-captionDark-dark"
             )}
           >
             {message}
@@ -91,4 +100,3 @@ export function AppError({
     </div>
   );
 }
-

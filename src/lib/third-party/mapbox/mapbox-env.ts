@@ -1,4 +1,14 @@
-export type MapStyleId = "light" | "streets" | "dark" | "satellite" | "outdoors" | "navigation-day" | "navigation-night";
+export type MapStyleId =
+  | "light"
+  | "streets"
+  | "dark"
+  | "satellite"
+  | "outdoors"
+  | "navigation-day"
+  | "navigation-night"
+  | "traffic"
+  | "trafficNight"
+  | "emerald";
 
 const STYLE_FALLBACK: Record<MapStyleId, string> = {
   light: "mapbox://styles/mapbox/light-v11",
@@ -8,6 +18,12 @@ const STYLE_FALLBACK: Record<MapStyleId, string> = {
   outdoors: "mapbox://styles/mapbox/outdoors-v12",
   "navigation-day": "mapbox://styles/mapbox/navigation-day-v1",
   "navigation-night": "mapbox://styles/mapbox/navigation-night-v1",
+  // More Mapbox style presets can be added here in the future:
+  // For example:
+
+  traffic: "mapbox://styles/mapbox/traffic-day-v2",
+  trafficNight: "mapbox://styles/mapbox/traffic-night-v2",
+  emerald: "mapbox://styles/mapbox/emerald-v9",
 };
 
 function readStyleEnv(key: string): string | undefined {
@@ -25,10 +41,14 @@ function readStyleEnv(key: string): string | undefined {
  */
 export function getMapboxStyleUrl(id: MapStyleId): string {
   if (id === "streets") {
-    return readStyleEnv("NEXT_PUBLIC_MAPBOX_STYLE_URL") ?? STYLE_FALLBACK.streets;
+    return (
+      readStyleEnv("NEXT_PUBLIC_MAPBOX_STYLE_URL") ?? STYLE_FALLBACK.streets
+    );
   }
   if (id === "dark") {
-    return readStyleEnv("NEXT_PUBLIC_MAPBOX_STYLE_URL_DARK") ?? STYLE_FALLBACK.dark;
+    return (
+      readStyleEnv("NEXT_PUBLIC_MAPBOX_STYLE_URL_DARK") ?? STYLE_FALLBACK.dark
+    );
   }
   if (id === "light") return STYLE_FALLBACK.light;
   if (id === "outdoors") return STYLE_FALLBACK.outdoors;

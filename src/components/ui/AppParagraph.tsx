@@ -1,7 +1,6 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 
-export interface AppParagraphProps
-  extends React.HTMLAttributes<HTMLParagraphElement> {
+export interface AppParagraphProps extends React.HTMLAttributes<HTMLParagraphElement> {
   /** Body (default) or caption/muted */
   variant?: "body" | "caption";
   size?: "sm" | "md" | "lg";
@@ -10,13 +9,13 @@ export interface AppParagraphProps
   children: React.ReactNode;
 }
 
-const variantClasses: Record<NonNullable<AppParagraphProps["variant"]>, string> =
-  {
-    body:
-      "text-primaryDark dark:text-primaryDark-dark font-metropolis-regular",
-    caption:
-      "text-captionDark dark:text-captionDark-dark font-metropolis-light",
-  };
+const variantClasses: Record<
+  NonNullable<AppParagraphProps["variant"]>,
+  string
+> = {
+  body: "text-primaryDark dark:text-primaryDark-dark font-metropolis-regular",
+  caption: "text-captionDark dark:text-captionDark-dark font-metropolis-light",
+};
 
 const sizeClasses: Record<NonNullable<AppParagraphProps["size"]>, string> = {
   sm: "text-sm",

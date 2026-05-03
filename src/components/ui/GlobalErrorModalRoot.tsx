@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { ShieldAlert, X } from "lucide-react";
 import { gsap } from "gsap";
 import { useGlobalErrorStore } from "@/store/reusables/global-error-store";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 import { AppButton } from "./AppButton";
 import { AppParagraph } from "./AppParagraph";
 
@@ -104,7 +104,7 @@ export function GlobalErrorModalRoot() {
           "relative z-10 mx-4 w-full max-w-sm rounded-2xl border border-white/10 bg-surface-dark/60 px-6 py-5 shadow-2xl",
           "backdrop-blur-2xl bg-clip-padding",
           "text-primaryDark-dark",
-          isPermission && "max-w-md border-amber-500/25",
+          isPermission && "max-w-md border-amber-500/25"
         )}
       >
         {isPermission ? (
@@ -120,15 +120,17 @@ export function GlobalErrorModalRoot() {
             "mb-3 items-start gap-2",
             isPermission
               ? "grid grid-cols-[2.25rem_minmax(0,1fr)_2.25rem]"
-              : "flex justify-between gap-3",
+              : "flex justify-between gap-3"
           )}
         >
-          {isPermission ? <span className="col-start-1 block w-9 shrink-0" aria-hidden /> : null}
+          {isPermission ? (
+            <span className="col-start-1 block w-9 shrink-0" aria-hidden />
+          ) : null}
           <h2
             id="global-error-title"
             className={cn(
               "min-w-0 text-sm font-metropolis-semibold leading-snug tracking-wide text-primaryDark-dark",
-              isPermission ? "col-start-2 text-center" : "flex-1 pr-1",
+              isPermission ? "col-start-2 text-center" : "flex-1 pr-1"
             )}
           >
             {title}
@@ -142,7 +144,7 @@ export function GlobalErrorModalRoot() {
               "bg-white/10 text-primaryDark-dark transition-colors hover:bg-white/20",
               "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40",
               "translate-y-px",
-              isPermission ? "col-start-3 justify-self-end" : "",
+              isPermission ? "col-start-3 justify-self-end" : ""
             )}
           >
             <X className="h-4 w-4 shrink-0" strokeWidth={2.25} aria-hidden />

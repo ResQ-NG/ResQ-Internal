@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
 import { severityColor } from "@/network/modules/internal/analytics/utils";
 
 export function HeatmapMostCritical({
@@ -48,4 +48,3 @@ export function HeatmapMostCritical({
     </div>
   );
 }
-

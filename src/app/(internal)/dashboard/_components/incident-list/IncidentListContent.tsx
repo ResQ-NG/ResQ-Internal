@@ -15,6 +15,7 @@ import type { CursorPaginatedResult } from "@/network/types";
 import { reportSimplifiedToSampleInboxRow } from "@/app/(internal)/dashboard/_utils/report-to-sample-inbox";
 import { IncidentListRow } from "../IncidentListRow";
 import type { SampleInboxRow } from "../sampleCommandData";
+import { INBOX_LIST_FILTER } from "@/lib/constants/incident-inbox";
 import type { IncidentListFilterKind } from "./incident-list.types";
 import type { ReportListItemDTO } from "@/network/modules/internal/incidents/reports/types";
 import type React from "react";
@@ -58,31 +59,7 @@ export function IncidentListContent({
   allScrollRef: React.RefObject<HTMLDivElement | null>;
   allSentinelRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  if (!useLiveReports) {
-    return (
-      <div
-        ref={allScrollRef}
-        className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-3 py-3"
-      >
-        {legacyRowsFiltered.length === 0 ? (
-          <p className="py-8 text-center text-sm text-captionDark dark:text-captionDark-dark">
-            All clear.
-          </p>
-        ) : (
-          legacyRowsFiltered.map((row) => (
-            <IncidentListRow
-              key={row.id}
-              row={row}
-              active={selectedRow?.id === row.id}
-              onClick={() => onRowClick(row)}
-            />
-          ))
-        )}
-      </div>
-    );
-  }
-
-  if (filter === "report") {
+  if (useLiveReports && filter === INBOX_LIST_FILTER.REPORT) {
     return (
       <InfiniteCursorList
         query={liveQuery}
@@ -104,24 +81,6 @@ export function IncidentListContent({
           );
         }}
       />
-    );
-  }
-
-  if (filter === "sos") {
-    return (
-      <div
-        ref={allScrollRef}
-        className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-3 py-3"
-      >
-        {sosRowsFiltered.map((row) => (
-          <IncidentListRow
-            key={row.id}
-            row={row}
-            active={selectedRow?.id === row.id}
-            onClick={() => onRowClick(row)}
-          />
-        ))}
-      </div>
     );
   }
 

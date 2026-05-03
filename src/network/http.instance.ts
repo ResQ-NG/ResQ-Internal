@@ -1,7 +1,7 @@
 // Auth: NextAuth session `accessToken` is synced in AppProviders; requests use `Authorization: Bearer <token>`.
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 import { API_URL } from "@/config/environment-config";
-import { ApiCustomError } from "@/lib/types";
+import { ApiCustomError } from "@/lib/dto/http";
 import { useGlobalErrorStore } from "@/store/reusables/global-error-store";
 
 let authToken: string | undefined = undefined;

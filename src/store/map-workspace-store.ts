@@ -1,9 +1,13 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { MapStyleId } from "@/lib/mapbox-env";
+import type { MapStyleId } from "@/lib/third-party/mapbox/mapbox-env";
 import { MAP_SIDEBAR_LEFT } from "@/app/(internal)/dashboard/_components/MapSidebarResizeGrip";
+import {
+  INBOX_LIST_FILTER,
+  type InboxListFilterKind,
+} from "@/lib/constants/incident-inbox";
 
-export type MapWorkspaceFilterKind = "all" | "sos" | "report";
+export type MapWorkspaceFilterKind = InboxListFilterKind;
 
 type MapWorkspaceState = {
   mapStyleId: MapStyleId;
@@ -11,6 +15,10 @@ type MapWorkspaceState = {
 
   filterKind: MapWorkspaceFilterKind;
   setFilterKind: (next: MapWorkspaceFilterKind) => void;
+
+  /** Poll reports while workspace map is open so list + markers stay fresh. */
+  mapLiveMode: boolean;
+  setMapLiveMode: (next: boolean) => void;
 
   leftSidebarWidth: number;
   setLeftSidebarWidth: (next: number) => void;
@@ -26,8 +34,11 @@ export const useMapWorkspaceStore = create<MapWorkspaceState>()(
       mapStyleId: "streets",
       setMapStyleId: (id) => set({ mapStyleId: id }),
 
-      filterKind: "all",
+      filterKind: INBOX_LIST_FILTER.ALL,
       setFilterKind: (next) => set({ filterKind: next }),
+
+      mapLiveMode: false,
+      setMapLiveMode: (next) => set({ mapLiveMode: next }),
 
       leftSidebarWidth: MAP_SIDEBAR_LEFT.default,
       setLeftSidebarWidth: (next) =>
@@ -45,9 +56,9 @@ export const useMapWorkspaceStore = create<MapWorkspaceState>()(
       partialize: (state) => ({
         mapStyleId: state.mapStyleId,
         filterKind: state.filterKind,
+        mapLiveMode: state.mapLiveMode,
         leftSidebarWidth: state.leftSidebarWidth,
       }),
     }
   )
 );
-

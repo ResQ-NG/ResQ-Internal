@@ -2,7 +2,8 @@
 
 import { AlertCircle, Filter, Loader2, Search } from "lucide-react";
 import { AppInput } from "@/components/ui";
-import { cn } from "@/lib/utils";
+import { INBOX_LIST_FILTER } from "@/lib/constants/incident-inbox";
+import { cn } from "@/lib/utils/generics";
 import type { IncidentListFilterKind } from "./incident-list.types";
 
 export function IncidentListHeader({
@@ -47,7 +48,7 @@ export function IncidentListHeader({
                 Incidents Panel
               </p>
               <p className="text-[10px] uppercase tracking-wide text-captionDark dark:text-captionDark-dark">
-                Live · staff reports + SOS
+                Live · staff reports
               </p>
             </div>
           </div>
@@ -70,7 +71,7 @@ export function IncidentListHeader({
             leftIcon={<Search className="h-4 w-4" />}
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="Search reports, SOS, category, location…"
+            placeholder="Search reports, category, location…"
             rightAdornment={
               query ? (
                 <button
@@ -88,11 +89,35 @@ export function IncidentListHeader({
         <div className="mt-3 flex items-center gap-1.5">
           <Filter className="h-3 w-3 shrink-0 text-captionDark dark:text-captionDark-dark" />
           {(
-            [
-              { id: "all", label: "All", count: sosCount + reportCount, dot: "bg-primary-blue" },
-              { id: "sos", label: "SOS", count: sosCount, dot: "bg-accent-red" },
-              { id: "report", label: "Reports", count: reportCount, dot: "bg-success-green" },
-            ] as { id: IncidentListFilterKind; label: string; count: number; dot: string }[]
+            useLiveReports
+              ? ([
+                  {
+                    id: INBOX_LIST_FILTER.REPORT,
+                    label: "Reports",
+                    count: reportCount,
+                    dot: "bg-success-green",
+                  },
+                ] as { id: IncidentListFilterKind; label: string; count: number; dot: string }[])
+              : ([
+                  {
+                    id: INBOX_LIST_FILTER.ALL,
+                    label: "All",
+                    count: sosCount + reportCount,
+                    dot: "bg-primary-blue",
+                  },
+                  {
+                    id: INBOX_LIST_FILTER.SOS,
+                    label: "SOS",
+                    count: sosCount,
+                    dot: "bg-accent-red",
+                  },
+                  {
+                    id: INBOX_LIST_FILTER.REPORT,
+                    label: "Reports",
+                    count: reportCount,
+                    dot: "bg-success-green",
+                  },
+                ] as { id: IncidentListFilterKind; label: string; count: number; dot: string }[])
           ).map(({ id, label, count, dot }) => (
             <button
               key={id}
@@ -125,4 +150,3 @@ export function IncidentListHeader({
     </div>
   );
 }
-

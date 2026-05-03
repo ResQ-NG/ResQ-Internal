@@ -1,6 +1,7 @@
 "use client";
 import { FileText, Images, MapPin, Radio, ShieldAlert } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/generics";
+import { isSosOrWatchMeRow } from "@/lib/constants/incident-inbox";
 import {
   incidentProcessTextClass,
   type IncidentCategoryBadge,
@@ -18,7 +19,7 @@ export function IncidentListRow({
   active: boolean;
   onClick: () => void;
 }) {
-  const isWatchMe = row.kind === "sos" || row.isWatchMe;
+  const isWatchMe = isSosOrWatchMeRow(row);
   const showPulse = Boolean(isWatchMe || row.requiresHumanReview);
 
   // Prefer rich category list; fall back to legacy single category string.
