@@ -47,7 +47,7 @@ export function AppSidebarRoot() {
   return (
     <div
       ref={backdropRef}
-      className="fixed inset-0 z-40 flex justify-end bg-black/30 backdrop-blur-xl"
+      className="fixed inset-0 z-60 flex justify-end bg-black/30 backdrop-blur-xl"
     >
       {/* Glass backdrop */}
       <button
@@ -62,7 +62,8 @@ export function AppSidebarRoot() {
         ref={panelRef}
         className={cn(
           "relative h-full w-80 max-w-full border-l border-white/10 bg-surface-dark/70 bg-clip-padding",
-          "backdrop-blur-2xl shadow-[0_0_40px_rgba(0,0,0,0.7)]"
+          "backdrop-blur-2xl shadow-[0_0_40px_rgba(0,0,0,0.7)]",
+          sidebarConfig.panelClassName
         )}
         aria-label="Global sidebar"
       >

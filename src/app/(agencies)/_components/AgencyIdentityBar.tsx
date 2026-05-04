@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { AGENCY_PROFILE } from "@/app/(agencies)/_data/agency-dummy-data";
 import { AppParagraph } from "@/components/ui";
 
 export function AgencyIdentityBar() {
@@ -20,14 +21,14 @@ export function AgencyIdentityBar() {
     <section className="flex items-center justify-between rounded-xl border border-captionDark/20 dark:border-captionDark-dark/25 bg-surface-light/80 dark:bg-black/60 px-4 py-3">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-accent text-sm font-metropolis-semibold text-white shadow-sm">
-          NA
+          {AGENCY_PROFILE.shortCode}
         </div>
         <div className="space-y-0.5">
           <p className="text-sm font-metropolis-semibold text-primaryDark dark:text-primaryDark-dark">
-            National Safety Agency
+            {AGENCY_PROFILE.name}
           </p>
           <AppParagraph variant="caption" className="text-xs">
-            Mainland Operations Branch · Lagos
+            {AGENCY_PROFILE.subtitle}
           </AppParagraph>
         </div>
       </div>

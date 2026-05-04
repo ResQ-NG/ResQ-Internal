@@ -24,17 +24,18 @@ const config: Config = {
           "red-dark": "#FF3366",
         },
         surface: {
-          light: "#F7F7F7",
+          /* Matches :root --background (220 14% 96%); solid for /opacity utilities */
+          light: "#eef1f6",
           dark: "#121212",
         },
         success: {
           green: "#17A34A",
           "green-dark": "#22C55E",
         },
-        // Typography tokens
-        primaryDark: "#222222",
+        // Typography tokens (light: softer ink + clearer secondary on gray canvas)
+        primaryDark: "#2a3140",
         "primaryDark-dark": "#E5E5E5",
-        captionDark: "#979797",
+        captionDark: "#5c6577",
         "captionDark-dark": "#A3A3A3",
         // Hero gradient stops for from-/via-/to-
         "resq-deep": "#001a3d",

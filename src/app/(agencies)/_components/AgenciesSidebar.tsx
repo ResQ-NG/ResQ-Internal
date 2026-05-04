@@ -16,6 +16,7 @@ import {
   Moon,
   User,
 } from "lucide-react";
+import { AGENCY_PROFILE } from "@/app/(agencies)/_data/agency-dummy-data";
 import { cn } from "@/lib/utils/generics";
 import { useUIStore } from "@/store/ui-store";
 
@@ -248,10 +249,10 @@ export function AgenciesSidebar() {
           {expanded && (
             <div className="flex min-w-0 flex-1 flex-col items-start">
               <span className="truncate text-sm font-metropolis-semibold text-white">
-                Agency name
+                {AGENCY_PROFILE.name}
               </span>
               <span className="truncate text-xs font-metropolis-medium text-captionDark-dark">
-                Ministry / department
+                {AGENCY_PROFILE.jurisdiction}
               </span>
             </div>
           )}

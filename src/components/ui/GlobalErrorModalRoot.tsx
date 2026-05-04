@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { ShieldAlert, X } from "lucide-react";
 import { gsap } from "gsap";
 import { useGlobalErrorStore } from "@/store/reusables/global-error-store";
@@ -76,13 +77,14 @@ export function GlobalErrorModalRoot() {
   }, [isOpen]);
 
   if (!isOpen) return null;
+  if (typeof document === "undefined") return null;
 
   const body =
     message?.trim() || "An unexpected error occurred. Please try again.";
   const title = titleForCode(code);
   const isPermission = code === "403";
 
-  return (
+  return createPortal(
     <div
       ref={backdropRef}
       className="fixed inset-0 z-[55] flex items-center justify-center bg-black/40 backdrop-blur-xl"
@@ -171,5 +173,5 @@ export function GlobalErrorModalRoot() {
         </AppButton>
       </div>
     </div>
-  );
+  , document.body);
 }

@@ -88,25 +88,26 @@
     --font-metropolis-bold: "Metropolis-Bold", system-ui, sans-serif;
     --font-metropolis-extrabold: "Metropolis-ExtraBold", system-ui, sans-serif;
     --font-metropolis-black: "Metropolis-Black", system-ui, sans-serif;
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
+    /* Light: soft canvas + ink (avoid pure #fff / #000 for less eye strain) */
+    --background: 220 14% 96%;
+    --foreground: 222 19% 20%;
+    --card: 0 0% 99.4%;
+    --card-foreground: 222 19% 20%;
+    --popover: 0 0% 99.4%;
+    --popover-foreground: 222 19% 20%;
+    --primary: 222 28% 20%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 12% 92.5%;
+    --secondary-foreground: 222 19% 20%;
+    --muted: 220 12% 92.5%;
+    --muted-foreground: 220 9% 40%;
+    --accent: 220 12% 92.5%;
+    --accent-foreground: 222 19% 20%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 11% 86%;
+    --input: 220 11% 86%;
+    --ring: 222 25% 38%;
     --radius: 0.5rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -178,18 +179,18 @@
   background: #000000;
 }
 
-/* Light / non-dark contexts: use surface-light track and blue thumb */
+/* Light / non-dark contexts: match canvas + muted brand thumb */
 html:not(.dark) {
-  scrollbar-color: #0000FF #F7F7F7;
+  scrollbar-color: #3d4fd9 hsl(var(--background));
 }
 
 html:not(.dark) *::-webkit-scrollbar-track {
-  background: #F7F7F7;
+  background: hsl(var(--background));
 }
 
 html:not(.dark) *::-webkit-scrollbar-thumb {
-  background: #0000FF;
-  border-color: #F7F7F7;
+  background: #3d4fd9;
+  border-color: hsl(var(--background));
 }
 
 /* Mapbox GL: hide wordmark + default attribution tray inside ResQ map hosts only.

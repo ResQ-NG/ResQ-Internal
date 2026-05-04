@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-metropolis antialiased bg-surface-light text-primaryDark dark:bg-surface-dark dark:text-primaryDark-dark">
+      <body className="font-metropolis antialiased bg-background text-foreground dark:bg-surface-dark dark:text-primaryDark-dark">
         <Script id="resq-theme" strategy="beforeInteractive">
           {themeScript}
         </Script>

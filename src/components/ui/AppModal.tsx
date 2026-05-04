@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { gsap } from "gsap";
 import { useUIStore } from "@/store/ui-store";
@@ -60,8 +61,9 @@ export function AppModalRoot() {
   }, [modalOpen]);
 
   if (!modalOpen) return null;
+  if (typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div
       ref={backdropRef}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xl"
@@ -114,5 +116,5 @@ export function AppModalRoot() {
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }

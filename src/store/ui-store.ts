@@ -15,6 +15,8 @@ interface ModalConfig {
 interface SidebarConfig {
   title?: string;
   content?: ReactNode;
+  /** Optional panel width / max-width (Tailwind), e.g. `w-full max-w-md sm:w-[26rem]`. */
+  panelClassName?: string;
 }
 
 interface UIState {

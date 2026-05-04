@@ -1,7 +1,53 @@
-import { AppHeading, AppParagraph } from "@/components/ui";
-import { DashboardHeader } from "../../_components/DashboardHeader";
+import { DashboardHeader } from "@/app/(internal)/_components/DashboardHeader";
+import { InternalContentWidthShell } from "@/app/(internal)/_components/InternalContentWidthShell";
+import { InternalAgenciesHub } from "./_components/InternalAgenciesHub";
+import { InternalAgenciesQuickLinks } from "./_components/InternalAgenciesQuickLinks";
+import type { InternalAgencyStatItem } from "./_components/InternalAgencyStatsBar";
+import { InternalAgencyStatsBar } from "./_components/InternalAgencyStatsBar";
+import { AppParagraph } from "@/components/ui";
+import {
+  getInternalAgenciesTopByOpenTickets,
+  getInternalAgencyRegionTickets,
+  getInternalAgencyStatusCounts,
+  INTERNAL_AGENCIES,
+  INTERNAL_AGENCY_SUMMARY,
+  INTERNAL_PRIMARY_BRANCHES,
+} from "./_data/internal-agencies-dummy";
+
+const ROWS = INTERNAL_AGENCIES;
+
+const STAT_ITEMS: readonly InternalAgencyStatItem[] = [
+  {
+    key: "agencies",
+    label: "Connected agencies",
+    value: String(INTERNAL_AGENCY_SUMMARY.agencyCount),
+    hint: "On this internal deployment (demo)",
+  },
+  {
+    key: "branches",
+    label: "Branches",
+    value: String(INTERNAL_AGENCY_SUMMARY.branchCount),
+    hint: "Routed sites & field desks",
+  },
+  {
+    key: "tickets",
+    label: "Open tickets",
+    value: String(INTERNAL_AGENCY_SUMMARY.openTickets),
+    hint: "Across loaded agency rows",
+  },
+  {
+    key: "pilots",
+    label: "Pilot programs",
+    value: String(INTERNAL_AGENCY_SUMMARY.pilotsCount),
+    hint: "Limited rollout agencies",
+  },
+];
 
 export default function AgenciesPage() {
+  const regionTickets = getInternalAgencyRegionTickets(ROWS);
+  const statusCounts = getInternalAgencyStatusCounts(ROWS);
+  const topTicketAgencies = getInternalAgenciesTopByOpenTickets(ROWS, 6);
+
   return (
     <>
       <DashboardHeader
@@ -9,35 +55,33 @@ export default function AgenciesPage() {
         dateRange="All agencies"
         showExport={false}
       />
-      <div className="p-6 space-y-8">
-        <section className="rounded-xl border border-captionDark/20 dark:border-captionDark-dark/20 bg-surface-light dark:bg-surface-dark p-6 shadow-sm">
-          <AppHeading as={2} size="sm" className="mb-2">
-            Agencies
-          </AppHeading>
-          <AppParagraph variant="caption" className="mb-4">
-            Table placeholder for agencies, branches, and key metrics. Wire this to
-            your agency list API.
-          </AppParagraph>
-          <div className="flex h-48 items-center justify-center rounded-lg border border-captionDark/15 dark:border-captionDark-dark/15 bg-surface-light/80 dark:bg-primaryDark/10">
-            <AppParagraph variant="caption">
-              Agencies table placeholder
+      <InternalContentWidthShell>
+        <div className="space-y-8 py-6 pb-12">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <AppParagraph
+              variant="caption"
+              className="max-w-2xl text-sm leading-relaxed"
+            >
+              Internal registry with demo search, status filters, and branch
+              footprints keyed off each main branch. Replace
+              `_data/internal-agencies-dummy` with API models when ready.
             </AppParagraph>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <InternalAgenciesQuickLinks />
+            </div>
           </div>
-        </section>
-        <section className="rounded-xl border border-captionDark/20 dark:border-captionDark-dark/20 bg-surface-light dark:bg-surface-dark p-6 shadow-sm">
-          <AppHeading as={2} size="sm" className="mb-2">
-            Branches map
-          </AppHeading>
-          <AppParagraph variant="caption" className="mb-4">
-            Map placeholder showing agency branches and locations with open tickets.
-          </AppParagraph>
-          <div className="flex h-64 items-center justify-center rounded-lg border border-captionDark/15 dark:border-captionDark-dark/15 bg-surface-light/80 dark:bg-primaryDark/10">
-            <AppParagraph variant="caption">
-              Map placeholder
-            </AppParagraph>
-          </div>
-        </section>
-      </div>
+
+          <InternalAgencyStatsBar items={STAT_ITEMS} />
+
+          <InternalAgenciesHub
+            rows={ROWS}
+            primaryBranches={INTERNAL_PRIMARY_BRANCHES}
+            regionTickets={regionTickets}
+            statusCounts={statusCounts}
+            topTicketAgencies={topTicketAgencies}
+          />
+        </div>
+      </InternalContentWidthShell>
     </>
   );
 }

@@ -3,14 +3,19 @@ export function humanizeReportEventType(raw: string | null | undefined): string 
   if (!s) return "";
   // If backend already provides a label with spaces, keep it.
   if (s.includes(" ")) return s;
-  return s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  // Replace underscores and hyphens with spaces, then capitalize each word.
+  return s
+    .replace(/[_-]/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export function humanizeReportStatus(raw: string | null | undefined): string {
   const s = String(raw ?? "").trim();
   if (!s) return "";
   if (s.includes(" ")) return s;
-  return s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return s
+    .replace(/[_-]/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export function normalizeReportCategoryLabel(
