@@ -60,6 +60,10 @@ export function IncidentListDetailPanel({
         badgeCount={state.badgeCount}
         sosCount={state.sosCount}
         reportCount={state.reportCount}
+        advancedFilters={state.advancedFilters}
+        onAdvancedPatch={state.patchAdvancedFilters}
+        onResetAdvanced={state.resetAdvancedFilters}
+        activeAdvancedCount={state.activeAdvancedCount}
       />
 
       {/* Scrollable list region */}

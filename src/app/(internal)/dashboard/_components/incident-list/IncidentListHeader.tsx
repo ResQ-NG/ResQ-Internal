@@ -1,10 +1,28 @@
 "use client";
 
-import { AlertCircle, Filter, Loader2, Search } from "lucide-react";
+import { useEffect, useId, useState } from "react";
+import { AlertCircle, ChevronDown, Filter, Loader2, Search, SlidersHorizontal } from "lucide-react";
 import { AppInput } from "@/components/ui";
 import { INBOX_LIST_FILTER } from "@/lib/constants/incident-inbox";
 import { cn } from "@/lib/utils/generics";
-import type { IncidentListFilterKind } from "./incident-list.types";
+import type { IncidentListAdvancedFilters, IncidentListFilterKind } from "./incident-list.types";
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[10px] font-metropolis-semibold uppercase tracking-wider text-captionDark dark:text-captionDark-dark">
+        {label}
+      </p>
+      {children}
+    </div>
+  );
+}
 
 export function IncidentListHeader({
   filter,
@@ -17,6 +35,10 @@ export function IncidentListHeader({
   badgeCount,
   sosCount,
   reportCount,
+  advancedFilters,
+  onAdvancedPatch,
+  onResetAdvanced,
+  activeAdvancedCount,
 }: {
   filter: IncidentListFilterKind;
   onFilterChange: (f: IncidentListFilterKind) => void;
@@ -28,7 +50,23 @@ export function IncidentListHeader({
   badgeCount: number;
   sosCount: number;
   reportCount: number;
+  advancedFilters: IncidentListAdvancedFilters;
+  onAdvancedPatch: (patch: Partial<IncidentListAdvancedFilters>) => void;
+  onResetAdvanced: () => void;
+  activeAdvancedCount: number;
 }) {
+  const panelId = useId();
+  const [deepOpen, setDeepOpen] = useState(false);
+
+  useEffect(() => {
+    if (!deepOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDeepOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [deepOpen]);
+
   return (
     <div className="relative shrink-0 overflow-hidden border-b border-captionDark/10 dark:border-captionDark-dark/15">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-primary-blue/[0.05] via-transparent to-transparent dark:from-primary-blue-dark/[0.04]" />
@@ -66,25 +104,140 @@ export function IncidentListHeader({
           </div>
         </div>
 
-        <div className="mt-3">
-          <AppInput
-            leftIcon={<Search className="h-4 w-4" />}
-            value={query}
-            onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="Search reports, category, location…"
-            rightAdornment={
-              query ? (
-                <button
-                  type="button"
-                  onClick={onClearQuery}
-                  className="rounded-lg px-2 py-1 text-[11px] font-metropolis-semibold text-captionDark hover:bg-captionDark/10 dark:text-captionDark-dark dark:hover:bg-captionDark-dark/10"
-                >
-                  Clear
-                </button>
-              ) : null
-            }
-          />
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+          <div className="min-w-0 flex-1">
+            <AppInput
+              leftIcon={<Search className="h-4 w-4" />}
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              placeholder="Search reports, category, location…"
+              rightAdornment={
+                query ? (
+                  <button
+                    type="button"
+                    onClick={onClearQuery}
+                    className="rounded-lg px-2 py-1 text-[11px] font-metropolis-semibold text-captionDark hover:bg-captionDark/10 dark:text-captionDark-dark dark:hover:bg-captionDark-dark/10"
+                  >
+                    Clear
+                  </button>
+                ) : null
+              }
+            />
+          </div>
+
+          {useLiveReports ? (
+            <button
+              type="button"
+              id={`${panelId}-trigger`}
+              aria-expanded={deepOpen}
+              aria-controls={`${panelId}-panel`}
+              onClick={() => setDeepOpen((v) => !v)}
+              className={cn(
+                "inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-[12px] font-metropolis-semibold transition-colors sm:w-[8.5rem]",
+                deepOpen || activeAdvancedCount > 0
+                  ? "border-primary-blue/35 bg-primary-blue/[0.08] text-primary-blue dark:border-primary-blue-dark/30 dark:bg-primary-blue-dark/10 dark:text-primary-blue-dark"
+                  : "border-captionDark/15 text-captionDark hover:border-captionDark/25 hover:bg-captionDark/[0.06] dark:border-captionDark-dark/20 dark:text-captionDark-dark dark:hover:border-captionDark-dark/30 dark:hover:bg-captionDark-dark/[0.07]",
+              )}
+            >
+              <SlidersHorizontal className="h-4 w-4 shrink-0" aria-hidden />
+              <span className="min-w-0 truncate">Deep search</span>
+              {activeAdvancedCount > 0 ? (
+                <span className="ml-0.5 inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-primary-blue/15 px-1 text-[10px] font-bold text-primary-blue dark:bg-primary-blue-dark/20 dark:text-primary-blue-dark">
+                  {activeAdvancedCount}
+                </span>
+              ) : null}
+              <ChevronDown
+                className={cn("h-4 w-4 shrink-0 transition-transform", deepOpen ? "rotate-180" : "")}
+                aria-hidden
+              />
+            </button>
+          ) : null}
         </div>
+
+        {useLiveReports ? (
+          <div
+            className={cn(
+              "grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
+              deepOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+            )}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <div
+                id={`${panelId}-panel`}
+                role="region"
+                aria-labelledby={`${panelId}-trigger`}
+                className="mt-3 rounded-2xl border border-captionDark/12 bg-gradient-to-br from-surface-light/95 via-surface-light/80 to-primary-blue/[0.04] p-3 shadow-sm ring-1 ring-black/[0.03] dark:border-captionDark-dark/18 dark:from-surface-dark/95 dark:via-surface-dark/80 dark:to-primary-blue-dark/[0.05] dark:ring-white/[0.04]"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-captionDark/10 pb-2.5 dark:border-captionDark-dark/15">
+                  <p className="text-[11px] leading-snug text-captionDark dark:text-captionDark-dark">
+                    Refine the staff reports feed — same fields the API accepts (country, region,
+                    dates…).
+                  </p>
+                  {activeAdvancedCount > 0 ? (
+                    <button
+                      type="button"
+                      onClick={onResetAdvanced}
+                      className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-metropolis-semibold text-captionDark underline decoration-captionDark/35 underline-offset-2 hover:text-primaryDark dark:text-captionDark-dark dark:hover:text-primaryDark-dark"
+                    >
+                      Reset filters
+                    </button>
+                  ) : null}
+                </div>
+
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <Field label="Country">
+                    <AppInput
+                      value={advancedFilters.country}
+                      onChange={(e) => onAdvancedPatch({ country: e.target.value })}
+                      placeholder="e.g. Nigeria"
+                      aria-label="Country"
+                    />
+                  </Field>
+                  <Field label="State / region">
+                    <AppInput
+                      value={advancedFilters.state}
+                      onChange={(e) => onAdvancedPatch({ state: e.target.value })}
+                      placeholder="e.g. Lagos"
+                      aria-label="State or region"
+                    />
+                  </Field>
+                  <Field label="City">
+                    <AppInput
+                      value={advancedFilters.city}
+                      onChange={(e) => onAdvancedPatch({ city: e.target.value })}
+                      placeholder="e.g. Ikeja"
+                      aria-label="City"
+                    />
+                  </Field>
+                  <Field label="Reporter name">
+                    <AppInput
+                      value={advancedFilters.reporter_name}
+                      onChange={(e) => onAdvancedPatch({ reporter_name: e.target.value })}
+                      placeholder="Partial match"
+                      aria-label="Reporter name"
+                    />
+                  </Field>
+                  <Field label="Created from">
+                    <AppInput
+                      type="date"
+                      value={advancedFilters.created_from}
+                      onChange={(e) => onAdvancedPatch({ created_from: e.target.value })}
+                      aria-label="Created from date"
+                    />
+                  </Field>
+                  <Field label="Created to">
+                    <AppInput
+                      type="date"
+                      value={advancedFilters.created_to}
+                      onChange={(e) => onAdvancedPatch({ created_to: e.target.value })}
+                      aria-label="Created to date"
+                    />
+                  </Field>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-3 flex items-center gap-1.5">
           <Filter className="h-3 w-3 shrink-0 text-captionDark dark:text-captionDark-dark" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { flattenCursorItems } from "@/components/ui/InfiniteCursorList";
 import { useDebouncedValue } from "@/lib/hooks/use-debounced-value";
 import { useIntersectFetchNext } from "@/lib/hooks/use-intersect-fetch-next";
@@ -8,7 +8,12 @@ import { useInfiniteReports } from "@/network/modules/internal/incidents/reports
 import { reportSimplifiedToSampleInboxRow } from "@/app/(internal)/dashboard/_utils/report-to-sample-inbox";
 import type { SampleInboxRow } from "../sampleCommandData";
 import { INBOX_LIST_FILTER } from "@/lib/constants/incident-inbox";
-import type { IncidentListFilterKind } from "./incident-list.types";
+import {
+  INCIDENT_LIST_ADVANCED_EMPTY,
+  type IncidentListAdvancedFilters,
+  type IncidentListFilterKind,
+} from "./incident-list.types";
+import { buildStaffReportsListParams, countIncidentAdvancedFilters } from "./incident-list-query";
 
 const LIVE_MAP_REFETCH_MS = 15_000;
 
@@ -20,25 +25,32 @@ export function useIncidentListState({
   /** When true with live reports, periodically refetches so map + list stay current. */
   mapLiveMode?: boolean;
 }) {
-  // Workspace (and modern dashboard) is API-backed; keep the UI focused on reports.
   const [filter, setFilter] = useState<IncidentListFilterKind>(
     useLiveReports ? INBOX_LIST_FILTER.REPORT : INBOX_LIST_FILTER.ALL,
   );
   const [query, setQuery] = useState("");
-  const debouncedQuery = useDebouncedValue(query.trim(), 300);
-
-  const liveQuery = useInfiniteReports(
-    {
-      limit: 100,
-      search: debouncedQuery ? debouncedQuery : undefined,
-    },
-    {
-      enabled: useLiveReports,
-      refetchInterval:
-        useLiveReports && mapLiveMode ? LIVE_MAP_REFETCH_MS : false,
-      refetchIntervalInBackground: true,
-    },
+  const [advancedFilters, setAdvancedFilters] = useState<IncidentListAdvancedFilters>(
+    INCIDENT_LIST_ADVANCED_EMPTY,
   );
+
+  const debouncedQuery = useDebouncedValue(query.trim(), 300);
+  const debouncedAdvanced = useDebouncedValue(advancedFilters, 400);
+
+  const reportQueryParams = useMemo(
+    () =>
+      buildStaffReportsListParams({
+        limit: 100,
+        search: debouncedQuery || undefined,
+        advanced: debouncedAdvanced,
+      }),
+    [debouncedQuery, debouncedAdvanced],
+  );
+
+  const liveQuery = useInfiniteReports(reportQueryParams, {
+    enabled: useLiveReports,
+    refetchInterval: useLiveReports && mapLiveMode ? LIVE_MAP_REFETCH_MS : false,
+    refetchIntervalInBackground: true,
+  });
 
   const allScrollRef = useRef<HTMLDivElement>(null);
   const allSentinelRef = useRef<HTMLDivElement>(null);
@@ -48,11 +60,9 @@ export function useIncidentListState({
     [liveQuery.data],
   );
 
-  // Workspace: no demo SOS/legacy rows.
   const legacyRowsFiltered = useMemo(() => [] as SampleInboxRow[], []);
   const sosRowsFiltered = useMemo(() => [] as SampleInboxRow[], []);
 
-  // Reports search is backend-driven; don't double-filter client-side.
   const apiRowsFiltered = apiRows;
 
   const sosCount = sosRowsFiltered.length;
@@ -63,6 +73,19 @@ export function useIncidentListState({
       : filter === INBOX_LIST_FILTER.REPORT
         ? reportCount
         : sosCount + reportCount;
+
+  const patchAdvancedFilters = useCallback((patch: Partial<IncidentListAdvancedFilters>) => {
+    setAdvancedFilters((prev) => ({ ...prev, ...patch }));
+  }, []);
+
+  const resetAdvancedFilters = useCallback(() => {
+    setAdvancedFilters(INCIDENT_LIST_ADVANCED_EMPTY);
+  }, []);
+
+  const activeAdvancedCount = useMemo(
+    () => countIncidentAdvancedFilters(advancedFilters),
+    [advancedFilters],
+  );
 
   useIntersectFetchNext({
     rootRef: allScrollRef,
@@ -82,6 +105,10 @@ export function useIncidentListState({
     setFilter,
     query,
     setQuery,
+    advancedFilters,
+    patchAdvancedFilters,
+    resetAdvancedFilters,
+    activeAdvancedCount,
     liveQuery,
     apiRows,
     apiRowsFiltered,
@@ -94,4 +121,3 @@ export function useIncidentListState({
     allSentinelRef,
   };
 }
-

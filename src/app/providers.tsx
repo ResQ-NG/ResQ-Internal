@@ -1,26 +1,59 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools/production";
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider, signOut, useSession } from "next-auth/react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { AppAlertToaster } from "@/components/ui/AppAlert";
 import { GlobalErrorModalRoot } from "@/components/ui/GlobalErrorModalRoot";
 import { AppModalRoot } from "@/components/ui/AppModal";
 import { AppSidebarRoot } from "@/components/ui/AppSidebar";
-import { clearAuthToken, setAuthToken } from "@/network/http.instance";
+import { HttpAuthTokenSync, HttpSessionAfterRefreshSync } from "./HttpAuthSessionSync";
+import { WebsocketEventHandler } from "@/network/websocket/WebsocketEventHandler";
 
-function HttpAuthTokenSync() {
+/** Signs out when the wall-clock session window ends (shorter when “Remember me” is off). */
+function SessionExpirySync() {
   const { data: session, status } = useSession();
 
+  const checkAndSignOut = useCallback(() => {
+    if (status !== "authenticated" || !session?.sessionAbsoluteExpires) return;
+    const end = new Date(session.sessionAbsoluteExpires).getTime();
+    if (Number.isNaN(end) || Date.now() < end) return;
+    void signOut({ callbackUrl: "/authourize" });
+  }, [session?.sessionAbsoluteExpires, status]);
+
   useEffect(() => {
-    if (status === "authenticated" && session?.accessToken) {
-      setAuthToken(session.accessToken);
-    } else if (status === "unauthenticated") {
-      clearAuthToken();
+    checkAndSignOut();
+  }, [checkAndSignOut]);
+
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.sessionAbsoluteExpires) return;
+    const end = new Date(session.sessionAbsoluteExpires).getTime();
+    if (Number.isNaN(end)) return;
+    const ms = end - Date.now();
+    if (ms <= 0) {
+      void signOut({ callbackUrl: "/authourize" });
+      return;
     }
-  }, [session?.accessToken, status]);
+    const capped = Math.min(ms, 2147483647);
+    const id = window.setTimeout(() => {
+      void signOut({ callbackUrl: "/authourize" });
+    }, capped);
+    return () => window.clearTimeout(id);
+  }, [session?.sessionAbsoluteExpires, status]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") checkAndSignOut();
+    };
+    window.addEventListener("focus", checkAndSignOut);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.removeEventListener("focus", checkAndSignOut);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [checkAndSignOut]);
 
   return null;
 }
@@ -40,7 +73,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <SessionProvider>
       <HttpAuthTokenSync />
+      <HttpSessionAfterRefreshSync />
+      <SessionExpirySync />
       <QueryClientProvider client={queryClient}>
+        <WebsocketEventHandler />
         <NuqsAdapter>
           {children}
           <AppModalRoot />

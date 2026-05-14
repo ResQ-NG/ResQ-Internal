@@ -12,6 +12,7 @@ const fieldClass =
 export function SignInForm() {
   const [pending, setPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,6 +26,7 @@ export function SignInForm() {
         redirect: false,
         email,
         password,
+        rememberMe: rememberMe ? "true" : "false",
         callbackUrl: "/dashboard",
       });
 
@@ -108,6 +110,17 @@ export function SignInForm() {
             </button>
           </div>
         </div>
+
+        <label className="flex cursor-pointer items-start gap-3 text-sm text-white/90">
+          <input
+            name="rememberMe"
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(ev) => setRememberMe(ev.target.checked)}
+            className="mt-0.5 size-4 shrink-0 rounded border border-white/40 bg-white/10 text-primary-blue focus:ring-2 focus:ring-primary-blue/35"
+          />
+          <span className="font-metropolis-medium leading-snug">Remember me on this device</span>
+        </label>
       </div>
 
       <AppButton

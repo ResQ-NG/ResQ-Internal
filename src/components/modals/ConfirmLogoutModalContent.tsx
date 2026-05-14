@@ -1,14 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { AppButton } from "@/components/ui/AppButton";
 import { AppParagraph } from "@/components/ui/AppParagraph";
+import { useLogout } from "@/network/modules/shared/auth/queries";
 import { useUIStore } from "@/store/ui-store";
+
+type SessionWithTokens = {
+  accessToken?: string;
+  refreshToken?: string;
+};
 
 export function ConfirmLogoutModalContent() {
   const closeModal = useUIStore((s) => s.closeModal);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const { data: session } = useSession();
+  const { mutateAsync: logoutOnServer } = useLogout();
 
   return (
     <div>
@@ -35,6 +43,17 @@ export function ConfirmLogoutModalContent() {
             if (isSigningOut) return;
             setIsSigningOut(true);
             try {
+              const s = session as SessionWithTokens | null;
+              const body =
+                s?.refreshToken != null && s.refreshToken !== ""
+                  ? { refresh_token: s.refreshToken }
+                  : {};
+              try {
+                await logoutOnServer(body);
+              } catch {
+                /* Bearer may already be invalid; continue with client sign-out */
+              }
+              closeModal();
               await signOut({ callbackUrl: "/authourize" });
             } finally {
               setIsSigningOut(false);
